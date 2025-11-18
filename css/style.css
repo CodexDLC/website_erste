@@ -1,0 +1,332 @@
+/* css/style.css */
+
+/* === СИСТЕМА ПЕРЕМЕННЫХ (THEME SYSTEM) === */
+:root {
+    /* Шрифты */
+    --font-family: "Inter", sans-serif;          /* Основной шрифт текста */
+    --second-family: "Plus Jakarta Sans", sans-serif; /* Шрифт заголовков */
+
+    /* Цветовая палитра */
+    --page-bg-color: #151515;    /* Основной фон страницы (как ты просил) */
+    --container-bg: #1e1e2e;     /* Фон для блоков (если понадобится) */
+    --input-bg: #27273a;         /* Фон полей ввода */
+    
+    --accent-color: #3b82f6;     /* Основной синий цвет (кнопки, ссылки) */
+    --accent-hover: #2563eb;     /* Синий цвет при наведении */
+    
+    --text-main: #ffffff;        /* Основной цвет текста */
+    --text-muted: #a0a0b0;       /* Вторичный цвет текста (серый) */
+    --border-color: #333333;     /* Цвет тонких линий */
+    
+    --danger-color: #ef4444;     /* Цвет ошибок и удаления (красный) */
+}
+
+/* === БАЗОВЫЕ НАСТРОЙКИ === */
+body {
+    background-color: var(--page-bg-color);
+    font-family: var(--font-family); /* Используем переменную шрифта */
+    color: var(--text-main);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Для заголовков используем второй шрифт (для красоты) */
+h1, h2, h3, button {
+    font-family: var(--second-family);
+}
+
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; border: none; }
+
+/* === ГЛАВНАЯ СТРАНИЦА (index.html) === */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: var(--text-main);
+}
+
+.header h2 {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text-muted); /* Используем переменную серого цвета */
+    margin-bottom: 30px;
+}
+
+.showcase-btn {
+    display: inline-block;       /* Чтобы работали отступы у ссылки */
+    background-color: #0060FF;   /* Тот самый яркий синий (или var(--accent-color)) */
+    color: #ffffff;              /* Белый текст */
+    
+    /* Размеры и текст */
+    padding: 15px 40px;          /* Большие отступы внутри кнопки */
+    font-size: 14px;             /* Размер шрифта */
+    text-transform: uppercase;   /* ДЕЛАЕТ ВСЕ БУКВЫ ЗАГЛАВНЫМИ */
+    font-weight: 700;            /* Жирный шрифт */
+    letter-spacing: 0.5px;       /* Чуть раздвигаем буквы */
+    
+    /* Границы */
+    border-radius: 8px;          /* Скругление углов */
+    border: none;                /* Убираем рамку */
+    text-decoration: none;       /* Убираем подчеркивание ссылки */
+    
+    /* Анимация */
+    transition: opacity 0.2s;
+}
+
+.showcase-btn:hover {
+    opacity: 0.8;                /* При наведении кнопка чуть светлеет */
+    /* background-color: ... можно не менять, opacity хватит */
+}
+
+.animals {
+    margin-top: 60px;
+    display: flex;
+    justify-content: center;
+}
+
+.animals img {
+    max-width: 100%;
+    height: auto;
+    max-height: 500px;
+    object-fit: contain; 
+}
+
+/* === СТРАНИЦА ЗАГРУЗКИ (upload_form.html) === */
+.upload-wrapper {
+    width: 100%;
+    max-width: 800px; 
+    margin: 0 auto;
+    padding-top: 40px;
+    text-align: center;
+    display: flex;           /* Добавили флекс */
+    flex-direction: column;  /* Чтобы элементы шли сверху вниз */
+    align-items: center;     /* Центруем всё по горизонтали */
+}
+
+.nav-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 30px;               /* Чуть больше отступ между табами */
+    margin-bottom: 40px; 
+}
+
+.tab-link {
+    background: none;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    padding-bottom: 5px;
+    border-bottom: 2px solid transparent; /* Чтобы текст не скакал при ховере */
+    transition: all 0.2s;
+}
+
+.tab-link.active {
+    color: var(--accent-color);
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.tab-link:hover {
+    color: var(--text-main);
+}
+
+/* Зона загрузки */
+.drop-area {
+    width: 100%;            /* Растягиваем на всю доступную ширину */
+    max-width: 600px;       /* Но не шире 600px */
+    box-sizing: border-box; /* Чтобы padding не ломал ширину */
+    
+    border: 2px dashed var(--accent-color);
+    background-color: rgba(59, 130, 246, 0.05);
+    border-radius: 16px;
+    padding: 40px 20px;     /* Отступы внутри */
+    margin-bottom: 20px;
+    transition: background 0.3s;
+}
+
+.drop-area.drag-over {
+    background-color: rgba(59, 130, 246, 0.15);
+}
+
+.drop-text { 
+    color: var(--text-muted); 
+    font-size: 0.9rem; 
+    line-height: 1.6;       /* Межстрочный интервал для красоты */
+}
+
+/* Синяя кнопка */
+.browse-btn {
+    display: block;
+    width: 100%;
+    max-width: 600px;
+    box-sizing: border-box;
+    
+    background-color: var(--accent-color);
+    color: var(--text-main);
+    padding: 14px;          /* Чуть больше кнопку */
+    border-radius: 8px;
+    font-weight: 600;
+    margin-bottom: 40px;    /* Отступ до нижнего блока */
+    text-transform: uppercase; /* Капсом, как на главной */
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+.browse-btn:hover {
+    background-color: var(--accent-hover);
+}
+
+/* Группа для нижнего инпута */
+.input-group {
+    width: 100%;
+    max-width: 600px;       /* Тоже ограничиваем ширину */
+    text-align: left;       /* Текст внутри выравниваем слева */
+}
+
+.input-label {
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
+.link-box {
+    width: 100%;
+    box-sizing: border-box; /* Важно для границ */
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color); /* Сделал рамку тоньше/серее */
+    border-radius: 8px;
+    padding: 5px 5px 5px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Если фокус на инпуте - подсветим рамку синим */
+.link-box:focus-within {
+    border-color: var(--accent-color);
+}
+
+.link-box input {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    width: 100%;
+    outline: none;
+    font-family: var(--font-family);
+    font-size: 0.9rem;
+}
+
+.copy-btn {
+    background-color: var(--accent-color);
+    color: var(--text-main);
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* === СПИСОК КАРТИНОК (images.html) === */
+
+/* Контейнер таблицы */
+.gallery-container {
+    width: 100%;            /* ВАЖНО: Растягиваем контейнер на всю ширину родителя */
+    max-width: 800px;       /* Но не шире 800px */
+    margin: 0 auto;         
+    text-align: left;       /* Возвращаем текст влево (иначе он центрируется) */
+    padding-bottom: 50px;   
+}
+
+/* Шапка таблицы (Name, Url, Delete) */
+.list-header {
+    display: flex;          /* Включаем строку */
+    width: 100%;            /* Строка тоже на всю ширину */
+    padding: 15px 0;        /* Отступы сверху и снизу */
+    color: var(--text-muted);
+    font-size: 0.9rem;      
+    font-weight: 600;       
+    border-bottom: 1px solid var(--border-color);
+    box-sizing: border-box; /* Чтобы padding не ломал ширину */
+}
+
+/* Строка с файлом (картинкой) */
+.list-item {
+    display: flex;          
+    width: 100%;            /* Строка на всю ширину */
+    align-items: center;    
+    padding: 15px 0;        
+    border-bottom: 1px solid #2a2a35;
+    box-sizing: border-box;
+}
+
+/* === КОЛОНКИ (Настройка ширины) === */
+/* Важно: сумма процентов должна быть 100% или меньше */
+
+/* 1. Имя */
+.col-name {
+    width: 30%;             /* 30% ширины под имя */
+    display: flex;          
+    align-items: center;    
+    color: var(--text-main);            
+    padding-left: 10px;
+    overflow: hidden;       /* Если имя длинное - обрезаем */
+}
+
+/* 2. URL */
+.col-url {
+    width: 55%;             /* 55% ширины под ссылку (самая широкая) */
+    color: var(--text-muted);         
+    font-size: 0.9rem;      
+    white-space: nowrap;    
+    overflow: hidden;       
+    text-overflow: ellipsis;
+    padding-right: 10px;
+}
+
+/* 3. Удалить */
+.col-action {
+    width: 15%;             /* 15% под кнопку */
+    display: flex;
+    justify-content: flex-end; /* Прижимаем кнопку к правому краю */
+    padding-right: 10px;
+}
+
+/* --- Иконки внутри списка --- */
+
+.file-icon {
+    background-color: var(--accent-color); 
+    width: 24px;            
+    height: 24px;           
+    border-radius: 4px;     
+    margin-right: 12px;
+    flex-shrink: 0;         /* Запрещаем иконке сжиматься */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-icon img {
+    width: 14px;            
+    height: 14px;
+    display: block;
+}
+
+/* Кнопка удаления */
+.delete-btn {
+    width: 32px;            
+    height: 32px;           
+    border-radius: 50%;     
+    background-color: rgba(239, 68, 68, 0.1); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
