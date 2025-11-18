@@ -1,0 +1,136 @@
+/* css/upload.css
+   Стили для страницы загрузки (upload_form.html):
+   Dropzone, инпуты, табы навигации.
+*/
+
+/* Обертка контента загрузки */
+.upload-wrapper {
+    width: 100%;
+    max-width: 800px; 
+    margin: 0 auto;
+    padding-top: 40px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Центровка всего контента по вертикали */
+}
+
+/* === НАВИГАЦИЯ (TABS) === */
+.nav-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 40px; 
+}
+
+.tab-link {
+    font-size: 1.1rem;
+    color: var(--text-gray);
+    padding-bottom: 5px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.tab-link.active {
+    color: var(--accent);
+    border-bottom: 2px solid var(--accent);
+}
+
+.tab-link:hover {
+    color: var(--text-white);
+}
+
+/* === ЗОНА ЗАГРУЗКИ (DROPZONE) === */
+.drop-area {
+    width: 100%;
+    max-width: 600px;
+    box-sizing: border-box;
+    
+    border: 2px dashed var(--accent);
+    background-color: rgba(59, 130, 246, 0.05); /* Полупрозрачный синий */
+    border-radius: 16px;
+    padding: 40px 20px;
+    margin-bottom: 20px;
+    transition: background-color 0.3s ease;
+}
+
+/* Стиль при наведении файла */
+.drop-area.drag-over {
+    background-color: rgba(59, 130, 246, 0.15);
+}
+
+.drop-text { 
+    color: var(--text-gray); 
+    font-size: 0.9rem; 
+    line-height: 1.6;
+}
+
+/* === КНОПКИ И ПОЛЯ === */
+.browse-btn {
+    display: block;
+    width: 100%;
+    max-width: 600px;
+    box-sizing: border-box;
+    
+    background-color: var(--accent);
+    color: var(--text-white);
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.browse-btn:hover {
+    background-color: var(--accent-hover);
+}
+
+/* Группа инпута "Current Upload" */
+.input-group {
+    width: 100%;
+    max-width: 600px;
+    text-align: left;
+}
+
+.input-label {
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: var(--text-white);
+    font-size: 0.95rem;
+}
+
+.link-box {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-line);
+    border-radius: 8px;
+    padding: 5px 5px 5px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.link-box input {
+    background: transparent;
+    border: none;
+    color: var(--text-gray);
+    width: 100%;
+    outline: none;
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+}
+
+.copy-btn {
+    background-color: var(--accent);
+    color: var(--text-white);
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}

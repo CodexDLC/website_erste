@@ -1,0 +1,98 @@
+/* css/main.css
+   Основной файл стилей: переменные, сброс и главная страница.
+*/
+
+/* === СИСТЕМА ПЕРЕМЕННЫХ (THEME SYSTEM) === */
+:root {
+    /* Типографика */
+    --font-main: "Inter", sans-serif;            /* Текст */
+    --font-headers: "Plus Jakarta Sans", sans-serif; /* Заголовки */
+
+    /* Цветовая палитра */
+    --page-bg: #151515;          /* Темный фон страницы */
+    --input-bg: #27273a;         /* Фон полей ввода */
+    
+    --accent: #3b82f6;           /* Основной синий (Brand Color) */
+    --accent-hover: #2563eb;     /* Синий при наведении */
+    
+    --text-white: #ffffff;       /* Белый текст */
+    --text-gray: #a0a0b0;        /* Серый (второстепенный) текст */
+    --border-line: #333333;      /* Цвет разделителей */
+    
+    --danger: #ef4444;           /* Цвет удаления (красный) */
+}
+
+/* === БАЗОВЫЕ НАСТРОЙКИ (RESET & BASE) === */
+body {
+    background-color: var(--page-bg);
+    font-family: var(--font-main);
+    color: var(--text-white);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Заголовки и кнопки наследуют акцентный шрифт */
+h1, h2, h3, button, .showcase-btn {
+    font-family: var(--font-headers);
+}
+
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; border: none; background: none; }
+
+/* === ОБЩИЙ ХЕДЕР (HEADER) === */
+.header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: var(--text-white);
+    text-align: center;
+}
+
+.header h2 {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text-gray);
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* === СТИЛИ ГЛАВНОЙ СТРАНИЦЫ (INDEX.HTML) === */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+/* Кнопка "Tail-ent Showcase" */
+.showcase-btn {
+    display: inline-block;
+    background-color: #0060FF;   /* Яркий синий для главной */
+    color: #ffffff;
+    padding: 15px 40px;
+    font-size: 14px;
+    text-transform: uppercase;   /* Все буквы заглавные */
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-radius: 8px;
+    transition: opacity 0.2s ease;
+}
+
+.showcase-btn:hover {
+    opacity: 0.8;
+}
+
+/* Блок с рандомной картинкой */
+.animals {
+    margin-top: 60px;
+    display: flex;
+    justify-content: center;
+}
+
+.animals img {
+    max-width: 100%;
+    height: auto;
+    max-height: 500px;
+    object-fit: contain; 
+}

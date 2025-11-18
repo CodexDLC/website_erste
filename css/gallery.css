@@ -1,0 +1,128 @@
+/* css/gallery.css */
+
+.gallery-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: left;
+    padding-bottom: 50px;
+}
+
+/* Шапка таблицы */
+.list-header {
+    display: flex;
+    width: 100%;
+    padding: 15px 0;
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-line);
+    box-sizing: border-box;
+}
+
+/* Строка элемента */
+.list-item {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #2a2a35;
+    box-sizing: border-box;
+}
+
+/* === НАСТРОЙКА КОЛОНОК === */
+
+/* 1. Имя файла */
+.col-name {
+    width: 30%;
+    display: flex;
+    align-items: center;
+    color: var(--text-white);
+    padding-left: 10px;
+    overflow: hidden;
+}
+
+/* 2. Ссылка (URL) */
+.col-url {
+    width: 45%;
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    padding-right: 10px;
+}
+
+/* 3. Действия (Actions) */
+.col-action {
+    width: 25%;
+    display: flex;
+    justify-content: flex-end; 
+    gap: 10px; 
+    padding-right: 10px;
+}
+
+/* === МИНИАТЮРЫ (THUMBNAILS) === */
+
+/* Контейнер для картинки */
+.file-icon {
+    width: 64px;            /* Размер миниатюры */
+    height: 64px;           
+    border-radius: 8px;     
+    margin-right: 20px;     
+    flex-shrink: 0;         
+    overflow: hidden;       
+    background-color: #2a2a35; 
+    border: 1px solid #333;    
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Сама картинка внутри (растягивается) */
+.file-icon img.thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;      
+    display: block;
+}
+
+/* Если картинки нет (иконка-заглушка) */
+.file-icon img:not(.thumbnail) {
+    width: 24px;            
+    height: 24px;
+    object-fit: contain;
+}
+
+/* === КНОПКИ ДЕЙСТВИЙ === */
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.action-btn img { width: 16px; height: 16px; display: block; }
+
+/* Кнопка Копировать (Синяя полупрозрачная) */
+.copy-btn-icon {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+.copy-btn-icon:hover {
+    background-color: rgba(59, 130, 246, 0.3);
+    transform: scale(1.1);
+}
+
+/* Кнопка Удалить (Красная полупрозрачная) */
+.delete-btn {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+.delete-btn:hover {
+    background-color: rgba(239, 68, 68, 0.3);
+    transform: scale(1.1);
+}
