@@ -1,0 +1,21 @@
+:root {
+  --font-family: "Inter", sans-serif;
+  --second-family: "Plus Jakarta Sans", sans-serif;
+}
+
+
+body {
+    font-family: var(--font-family);
+    margin: 0;
+    padding: 0;
+    background-color: #151515;
+    text-align: center;
+}
+
+.header>h1 {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    padding: 20px 0;
+    font-size: 2em;
+    font-weight: bold;
+}
