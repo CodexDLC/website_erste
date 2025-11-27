@@ -1,28 +1,28 @@
 /* css/main.css
-   Основной файл стилей: переменные, сброс и главная страница.
+   Шпаргалка по стилям. Тут все глобальные переменные и логика сетки.
 */
 
-/* === СИСТЕМА ПЕРЕМЕННЫХ (THEME SYSTEM) === */
+/* === НАСТРОЙКИ ТЕМЫ (THEME SYSTEM) === */
 :root {
-    /* Типографика */
-    --font-main: "Inter", sans-serif;            /* Текст */
-    --font-headers: "Plus Jakarta Sans", sans-serif; /* Заголовки */
+    /* Шрифты: один для текста, второй для заголовков */
+    --font-main: "Inter", sans-serif;
+    --font-headers: "Plus Jakarta Sans", sans-serif;
 
-    /* Цветовая палитра */
-    --page-bg: #151515;          /* Темный фон страницы */
-    --input-bg: #27273a;         /* Фон полей ввода */
+    /* Цвета: менять только здесь, чтобы обновилось везде */
+    --page-bg: #151515;          /* Основной фон (почти черный) */
+    --input-bg: #27273a;         /* Фон карточек и инпутов */
     
-    --accent: #3b82f6;           /* Основной синий (Brand Color) */
-    --accent-hover: #2563eb;     /* Синий при наведении */
+    --accent: #3b82f6;           /* Главный синий цвет */
+    --accent-hover: #2563eb;     /* Синий потемнее (для ховера) */
     
-    --text-white: #ffffff;       /* Белый текст */
-    --text-gray: #a0a0b0;        /* Серый (второстепенный) текст */
-    --border-line: #333333;      /* Цвет разделителей */
+    --text-white: #ffffff;
+    --text-gray: #a0a0b0;
+    --border-line: #333333;      /* Тонкие рамки */
     
-    --danger: #ef4444;           /* Цвет удаления (красный) */
+    --danger: #ef4444;           /* Красный для удаления */
 }
 
-/* === БАЗОВЫЕ НАСТРОЙКИ (RESET & BASE) === */
+/* === СБРОС И БАЗА === */
 body {
     background-color: var(--page-bg);
     font-family: var(--font-main);
@@ -33,7 +33,6 @@ body {
     min-height: 100vh;
 }
 
-/* Заголовки и кнопки наследуют акцентный шрифт */
 h1, h2, h3, button, .showcase-btn {
     font-family: var(--font-headers);
 }
@@ -41,7 +40,7 @@ h1, h2, h3, button, .showcase-btn {
 a { text-decoration: none; color: inherit; }
 button { cursor: pointer; border: none; background: none; }
 
-/* === ОБЩИЙ ХЕДЕР (HEADER) === */
+/* === ШАПКА === */
 .header h1 {
     font-size: 2rem;
     margin-bottom: 10px;
@@ -57,33 +56,31 @@ button { cursor: pointer; border: none; background: none; }
     text-align: center;
 }
 
-/* === СТИЛИ ГЛАВНОЙ СТРАНИЦЫ (INDEX.HTML) === */
+/* === КОНТЕЙНЕР ГЛАВНОЙ === */
 .container {
-    max-width: 1200px;
+    max-width: 1200px; /* Ограничитель ширины контента */
     margin: 0 auto;
     padding: 40px 20px;
     text-align: center;
 }
 
-/* Кнопка "Tail-ent Showcase" */
+/* Синяя кнопка на главной */
 .showcase-btn {
     display: inline-block;
-    background-color: #0060FF;   /* Яркий синий для главной */
+    background-color: #0060FF;
     color: #ffffff;
     padding: 15px 40px;
     font-size: 14px;
-    text-transform: uppercase;   /* Все буквы заглавные */
+    text-transform: uppercase;
     font-weight: 700;
     letter-spacing: 0.5px;
     border-radius: 8px;
     transition: opacity 0.2s ease;
 }
 
-.showcase-btn:hover {
-    opacity: 0.8;
-}
+.showcase-btn:hover { opacity: 0.8; }
 
-/* Блок с рандомной картинкой */
+/* Блок маскота (кот/собака), когда галерея пуста */
 .animals {
     margin-top: 60px;
     display: flex;
@@ -98,19 +95,33 @@ button { cursor: pointer; border: none; background: none; }
 }
 
 /* === УМНАЯ ГАЛЕРЕЯ (SMART GALLERY) === */
+/* Логика такая: контейнер - это колонка, в которой лежат ряды (.gallery-row) */
 .smart-gallery {
     margin-top: 40px;
     width: 100%;
-    /* По умолчанию (для 7+ картинок) — 4 колонки */
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    display: flex;
+    flex-direction: column; /* Ряды друг под другом */
+    gap: 20px; /* Вертикальный отступ между рядами */
 }
 
-/* Базовый стиль карточки */
+/* Обертка одного ряда. Flexbox сам центрует карточки внутри. */
+.gallery-row {
+    display: flex;
+    justify-content: center; /* Главная фишка: если карточек мало, они встанут по центру */
+    gap: 20px; /* Горизонтальный отступ */
+    width: 100%;
+}
+
+/* === КАРТОЧКА (БАЗОВЫЙ СТИЛЬ) === */
 .gallery-card {
     position: relative;
-    aspect-ratio: 1 / 1; /* Всегда квадрат */
+    /* МАТЕМАТИКА ШИРИНЫ:
+       (100% ширины - 40px на два отступа) / 3 колонки.
+       Это дает ровно 3 карточки в ряд. */
+    width: calc((100% - 40px) / 3);
+    
+    aspect-ratio: 16 / 9; /* Широкий киношный формат */
+    
     background-color: var(--input-bg);
     border: 1px solid var(--border-line);
     border-radius: 12px;
@@ -120,72 +131,107 @@ button { cursor: pointer; border: none; background: none; }
 }
 
 .gallery-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-5px); /* Легкий подскок */
     border-color: var(--accent);
 }
 
 .gallery-card img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover; /* Важно: заполняет прямоугольник, обрезая лишнее */
     display: block;
 }
 
-/* === МОДИФИКАТОРЫ РАСКЛАДКИ === */
+/* === МОДИФИКАТОРЫ РЯДОВ === */
 
-/* 1. ОДНА КАРТИНКА: По центру, 50% ширины */
-.layout-1 {
-    display: flex;        /* Переключаем на Flexbox для легкой центровки */
-    justify-content: center;
-}
-.layout-1 .gallery-card {
-    width: 50%;           /* Половина ширины контейнера */
-    max-width: 600px;     /* Ограничитель на всякий случай */
-    aspect-ratio: 16 / 9; /* Сделаем её чуть более панорамной, чем квадрат */
+/* ПРИМЕЧАНИЕ: 
+   Для рядов из 2 или 3 картинок (.row-len-2, .row-len-3) 
+   дополнительные стили НЕ НУЖНЫ. 
+   Они используют базовую ширину (33%) и центруются флексом сами.
+*/
+
+/* РЯД ИЗ 1-Й КАРТИНКИ:
+   Делаем её широкой, чтобы занимала место двух стандартных + отступ между ними.
+*/
+.row-len-1 .gallery-card {
+    /* Ширина 2-х колонок + дырка между ними (20px) */
+    width: calc( ((100% - 40px) / 3) * 2 + 20px );
+    
+    /* Делаем её чуть более вытянутой (панорамной) для красоты */
+    aspect-ratio: 21 / 9; 
 }
 
-/* 2. ДВЕ КАРТИНКИ: По центру, фиксированный размер (~275px) */
-.layout-2 {
+/* === БЛОК ПРОСМОТРА (VIEWER) === */
+.image-viewer {
+    width: 100%;
+    margin-top: 40px;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Контейнер внутри вьювера */
+.viewer-content {
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-line);
+    border-radius: 16px;
+    padding: 20px;
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+.viewer-content img {
+    max-width: 100%;
+    max-height: 80vh; /* Чтобы влазила в экран */
+    border-radius: 8px;
+    object-fit: contain;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.viewer-content h3 {
+    margin-top: 20px;
+    color: var(--text-white);
+    font-weight: 500;
+}
+
+/* Кнопки управления */
+.viewer-controls {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    width: 100%;
     justify-content: center;
-    gap: 20px;
-}
-.layout-2 .gallery-card {
-    width: 275px;         /* Фиксированный размер, как в стандартной сетке */
-    /* aspect-ratio остается 1/1 */
 }
 
-/* 3. ТРИ КАРТИНКИ: 3 колонки */
-.layout-3 {
-    grid-template-columns: repeat(3, 1fr);
+.btn-back, .btn-copy {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
 }
 
-/* 4. ЧЕТЫРЕ КАРТИНКИ: 2 колонки (Сетка 2x2) */
-.layout-4 {
-    grid-template-columns: repeat(2, 1fr);
+.btn-back {
+    background: transparent;
+    border: 1px solid var(--border-line);
+    color: var(--text-gray);
 }
-/* Опционально: можно ограничить ширину всей сетки, чтобы квадраты не были гигантскими */
-.layout-4 {
-    max-width: 800px;
-    margin-left: auto; 
-    margin-right: auto;
-}
-
-/* 5. ПЯТЬ КАРТИНОК: Мозаика (3 сверху, 2 снизу) */
-.layout-5 {
-    grid-template-columns: repeat(6, 1fr); /* Сетка из 6 виртуальных колонок */
-}
-/* Первые 3 элемента занимают по 2 колонки каждый (3*2=6) */
-.layout-5 .gallery-card:nth-child(-n+3) {
-    grid-column: span 2;
-}
-/* Элементы 4 и 5 занимают по 3 колонки каждый (2*3=6) -> встают во второй ряд */
-.layout-5 .gallery-card:nth-child(n+4) {
-    grid-column: span 3;
+.btn-back:hover {
+    border-color: var(--text-white);
+    color: var(--text-white);
 }
 
-/* 6. ШЕСТЬ КАРТИНОК: 3 колонки (Итог: 2 ряда по 3) */
-.layout-6 {
-    grid-template-columns: repeat(3, 1fr);
+.btn-copy {
+    background-color: var(--accent);
+    color: var(--text-white);
+}
+.btn-copy:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-2px);
 }
 
+/* Простая анимация появления */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

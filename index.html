@@ -25,8 +25,21 @@
         </div>
 
         <div id="home-gallery-grid" class="smart-gallery" style="display: none;"></div>
+
+        <div id="image-viewer" class="image-viewer" style="display: none;">
+            <div class="viewer-content">
+                <img id="viewer-img" src="" alt="Full View">
+                <h3 id="viewer-title">Filename.jpg</h3>
+                
+                <div class="viewer-controls">
+                    <button class="btn-back" id="btn-back-gallery">← Back to Gallery</button>
+                    <button class="btn-copy" id="btn-copy-url">Copy URL</button>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <script src="js/storage.js"></script>
     <script src="js/index.js"></script>
 
 </body>

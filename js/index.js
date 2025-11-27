@@ -1,70 +1,138 @@
 // js/index.js
+// Управляет переключением: Маскот <-> Галерея <-> Просмотр
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Получаем оба элемента
+    // --- ЭЛЕМЕНТЫ DOM ---
     const mascotBlock = document.getElementById('mascot-placeholder');
     const gridContainer = document.getElementById('home-gallery-grid');
-    const imgMascot = document.querySelector('.animals img'); // Для смены картинки маскота
+    const viewerBlock = document.getElementById('image-viewer');
+    const imgMascot = document.querySelector('.animals img'); 
     
-    // Безопасная проверка хранилища
+    // Элементы внутри вьювера
+    const viewerImg = document.getElementById('viewer-img');
+    const viewerTitle = document.getElementById('viewer-title');
+    const btnBack = document.getElementById('btn-back-gallery');
+    const btnCopy = document.getElementById('btn-copy-url');
+
+    // --- ПРОВЕРКИ ---
     if (typeof getGalleryData !== 'function') {
-        console.error('Storage system missing');
+        console.error('Ошибка: storage.js не подключен!');
         return;
     }
 
     const images = getGalleryData();
     const count = images.length;
 
-    // === СЦЕНАРИЙ 1: ГАЛЕРЕЯ ПУСТА (Показываем Маскота) ===
-    if (count === 0) {
-        if (mascotBlock) mascotBlock.style.display = 'flex'; // Показываем маскота
-        if (gridContainer) gridContainer.style.display = 'none'; // Скрываем сетку
+    // --- ФУНКЦИЯ: ОТКРЫТЬ ПРОСМОТР ---
+    function openViewer(file) {
+        // Скрываем сетку, показываем вьювер
+        gridContainer.style.display = 'none';
+        viewerBlock.style.display = 'block';
+        
+        // Заполняем данными
+        viewerImg.src = file.src;
+        viewerTitle.textContent = file.name;
 
-        // Твой старый код для рандомного маскота
-        const mascots = ['berd.png', 'cat.png', 'dog.png', 'dog2.png', 'dog3.png'];
-        if (imgMascot) {
-            const randomIndex = Math.floor(Math.random() * mascots.length);
-            const selectedImage = mascots[randomIndex];
-            imgMascot.src = `data/img/${selectedImage}`;
-            imgMascot.alt = `Mascot: ${selectedImage}`;
-        }
-        return; // На этом все, дальше код не выполняем
+        // Логика кнопки Copy
+        // Удаляем старые слушатели (клонированием), чтобы не плодить их
+        const newBtnCopy = btnCopy.cloneNode(true);
+        btnCopy.parentNode.replaceChild(newBtnCopy, btnCopy);
+        
+        newBtnCopy.addEventListener('click', () => {
+             const fakeUrl = `https://sharefile.xyz/${file.name}`;
+             navigator.clipboard.writeText(fakeUrl).then(() => {
+                 const oldText = newBtnCopy.textContent;
+                 newBtnCopy.textContent = 'COPIED!';
+                 newBtnCopy.style.backgroundColor = '#10b981'; // Зеленый
+                 setTimeout(() => {
+                     newBtnCopy.textContent = oldText;
+                     newBtnCopy.style.backgroundColor = ''; 
+                 }, 2000);
+             });
+        });
+
+        // Скролл наверх (для красоты)
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // === СЦЕНАРИЙ 2: ЕСТЬ КАРТИНКИ (Показываем Сетку) ===
-    if (mascotBlock) mascotBlock.style.display = 'none'; // Скрываем маскота
+    // --- ФУНКЦИЯ: ЗАКРЫТЬ ПРОСМОТР (НАЗАД) ---
+    function closeViewer() {
+        viewerBlock.style.display = 'none';
+        gridContainer.style.display = 'flex'; // Возвращаем сетку
+    }
+
+    // Слушатель на кнопку "Back"
+    if (btnBack) {
+        btnBack.onclick = closeViewer;
+    }
+
+    // === ЛОГИКА ЗАГРУЗКИ СТРАНИЦЫ ===
+
+    // 1. ЕСЛИ ПУСТО
+    if (count === 0) {
+        if (mascotBlock) mascotBlock.style.display = 'flex';
+        if (gridContainer) gridContainer.style.display = 'none';
+        if (viewerBlock) viewerBlock.style.display = 'none';
+
+        // Рандомный маскот
+        const mascots = ['berd.png', 'cat.png', 'dog.png', 'dog2.png', 'dog3.png'];
+        if (imgMascot) {
+            imgMascot.src = `data/img/${mascots[Math.floor(Math.random() * mascots.length)]}`;
+        }
+        return;
+    }
+
+    // 2. ЕСЛИ ЕСТЬ КАРТИНКИ (Рендерим сетку)
+    if (mascotBlock) mascotBlock.style.display = 'none';
+    if (viewerBlock) viewerBlock.style.display = 'none';
     
     if (gridContainer) {
-        // Сбрасываем display, чтобы сработал CSS Grid/Flex из классов
-        gridContainer.style.display = ''; 
-        gridContainer.className = 'smart-gallery'; // Сброс классов
+        gridContainer.style.display = 'flex';
+        gridContainer.className = 'smart-gallery';
+        gridContainer.innerHTML = ''; 
 
-        // Назначаем Layout (раскладку)
-        if (count === 1) gridContainer.classList.add('layout-1');
-        else if (count === 2) gridContainer.classList.add('layout-2');
-        else if (count === 3) gridContainer.classList.add('layout-3');
-        else if (count === 4) gridContainer.classList.add('layout-4');
-        else if (count === 5) gridContainer.classList.add('layout-5');
-        else if (count === 6) gridContainer.classList.add('layout-6');
-
-        // Рендерим картинки (новые сверху)
         const recentImages = images.slice().reverse();
 
-        recentImages.forEach(file => {
-            const card = document.createElement('div');
-            card.className = 'gallery-card';
-            
-            // Клик пока простой alert, позже заменим на открытие
-            card.onclick = () => {
-                alert('Opening image: ' + file.name);
-            };
+        // --- УМНАЯ НАРЕЗКА (Chunking) ---
+        let sliceSizes = [];
+        if (count === 3) sliceSizes = [2, 1];
+        else if (count === 4) sliceSizes = [2, 2];
+        else {
+            let remaining = count;
+            while (remaining > 0) {
+                const size = remaining >= 3 ? 3 : remaining;
+                sliceSizes.push(size);
+                remaining -= size;
+            }
+        }
 
-            const img = document.createElement('img');
-            img.src = file.src;
-            img.alt = file.name;
+        // --- ОТРИСОВКА ---
+        let currentIndex = 0;
+
+        sliceSizes.forEach(size => {
+            const chunk = recentImages.slice(currentIndex, currentIndex + size);
+            currentIndex += size;
+
+            const rowDiv = document.createElement('div');
+            rowDiv.className = `gallery-row row-len-${chunk.length}`;
             
-            card.appendChild(img);
-            gridContainer.appendChild(card);
+            chunk.forEach(file => {
+                const card = document.createElement('div');
+                card.className = 'gallery-card';
+                
+                // --- ВАЖНО: ТЕПЕРЬ МЫ НЕ ИДЕМ НА НОВУЮ СТРАНИЦУ ---
+                // Мы вызываем функцию внутри этого же скрипта
+                card.onclick = () => openViewer(file);
+
+                const img = document.createElement('img');
+                img.src = file.src;
+                img.alt = file.name;
+                
+                card.appendChild(img);
+                rowDiv.appendChild(card);
+            });
+
+            gridContainer.appendChild(rowDiv);
         });
     }
 });
