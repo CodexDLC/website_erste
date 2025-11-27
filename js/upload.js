@@ -32,20 +32,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Drag & Drop ---
-    if (dropZone) {
+// --- Drag & Drop ---
+    if (dropZone && fileInput) {
+        // 1. Клик открывает выбор файлов (твоя новая фишка)
+        dropZone.addEventListener('click', () => {
+            fileInput.click(); 
+        });
+
+        // 2. ВАЖНО: Разрешаем перетаскивание (без этого drop не сработает!)
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault(); 
             dropZone.classList.add('drag-over');
         });
 
+        // 3. Убираем подсветку, если увели файл
         dropZone.addEventListener('dragleave', () => {
             dropZone.classList.remove('drag-over');
         });
 
+        // 4. Обработка броска файла
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('drag-over');
+            // Важно остановить всплытие, чтобы не открылся клик
+            e.stopPropagation(); 
+
             if (e.dataTransfer.files.length > 0) {
                 handleFiles(e.dataTransfer.files);
             }

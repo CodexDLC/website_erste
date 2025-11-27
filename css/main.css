@@ -96,3 +96,96 @@ button { cursor: pointer; border: none; background: none; }
     max-height: 500px;
     object-fit: contain; 
 }
+
+/* === УМНАЯ ГАЛЕРЕЯ (SMART GALLERY) === */
+.smart-gallery {
+    margin-top: 40px;
+    width: 100%;
+    /* По умолчанию (для 7+ картинок) — 4 колонки */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+/* Базовый стиль карточки */
+.gallery-card {
+    position: relative;
+    aspect-ratio: 1 / 1; /* Всегда квадрат */
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-line);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.gallery-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent);
+}
+
+.gallery-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* === МОДИФИКАТОРЫ РАСКЛАДКИ === */
+
+/* 1. ОДНА КАРТИНКА: По центру, 50% ширины */
+.layout-1 {
+    display: flex;        /* Переключаем на Flexbox для легкой центровки */
+    justify-content: center;
+}
+.layout-1 .gallery-card {
+    width: 50%;           /* Половина ширины контейнера */
+    max-width: 600px;     /* Ограничитель на всякий случай */
+    aspect-ratio: 16 / 9; /* Сделаем её чуть более панорамной, чем квадрат */
+}
+
+/* 2. ДВЕ КАРТИНКИ: По центру, фиксированный размер (~275px) */
+.layout-2 {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.layout-2 .gallery-card {
+    width: 275px;         /* Фиксированный размер, как в стандартной сетке */
+    /* aspect-ratio остается 1/1 */
+}
+
+/* 3. ТРИ КАРТИНКИ: 3 колонки */
+.layout-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* 4. ЧЕТЫРЕ КАРТИНКИ: 2 колонки (Сетка 2x2) */
+.layout-4 {
+    grid-template-columns: repeat(2, 1fr);
+}
+/* Опционально: можно ограничить ширину всей сетки, чтобы квадраты не были гигантскими */
+.layout-4 {
+    max-width: 800px;
+    margin-left: auto; 
+    margin-right: auto;
+}
+
+/* 5. ПЯТЬ КАРТИНОК: Мозаика (3 сверху, 2 снизу) */
+.layout-5 {
+    grid-template-columns: repeat(6, 1fr); /* Сетка из 6 виртуальных колонок */
+}
+/* Первые 3 элемента занимают по 2 колонки каждый (3*2=6) */
+.layout-5 .gallery-card:nth-child(-n+3) {
+    grid-column: span 2;
+}
+/* Элементы 4 и 5 занимают по 3 колонки каждый (2*3=6) -> встают во второй ряд */
+.layout-5 .gallery-card:nth-child(n+4) {
+    grid-column: span 3;
+}
+
+/* 6. ШЕСТЬ КАРТИНОК: 3 колонки (Итог: 2 ряда по 3) */
+.layout-6 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
