@@ -1,0 +1,31 @@
+# Git
+.git
+.gitignore
+
+# Python / Venv
+__pycache__
+.venv
+.env
+*.pyc
+*.pyo
+*.pyd
+
+# IDE
+.idea
+.vscode
+
+# Tests & Linting
+.pytest_cache
+.mypy_cache
+.ruff_cache
+tests/
+requirements-dev.txt
+
+# Data & Docs
+data/
+docs/
+README.MD
+
+# Frontend (if building backend only)
+frontend/
+node_modules/

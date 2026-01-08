@@ -1,0 +1,13 @@
+-r backend/requirements.txt
+
+# Linting & Formatting
+ruff
+mypy
+
+# Testing
+pytest
+pytest-asyncio
+httpx  # For testing API
+
+# Debugging
+ipdb
