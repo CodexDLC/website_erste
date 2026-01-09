@@ -2,6 +2,14 @@
 
 # 🐍 Backend Documentation
 
+## 📦 Modules (Domains)
+Быстрый переход к документации бизнес-доменов.
+
+*   **👤 [Users Domain](./architecture/domains/users/index.md)**
+    *   Регистрация, Аутентификация (JWT), Профили.
+*   **🖼️ [Media Domain](./architecture/domains/media/index.md)**
+    *   Загрузка файлов, CAS хранилище, Галерея.
+
 ## 📂 Project Structure & Navigation
 
 Ниже представлена структура проекта. Кликайте на папки для перехода к документации.
@@ -10,8 +18,13 @@
 ```text
 backend/
  ┣ 📂 [core](./architecture/core/index.md)             # Инфраструктурный слой (Config, DB Connect, Logs)
+ ┃ ┣ 📂 schemas                                        # Базовые Pydantic схемы (Error, Base)
+ ┃ ┃ ┣ 📜 base.py
+ ┃ ┃ ┗ 📜 error.py
  ┃ ┣ 📜 config.py
  ┃ ┣ 📜 database.py
+ ┃ ┣ 📜 dependencies.py                                # FastAPI Dependencies (get_current_user)
+ ┃ ┣ 📜 exceptions.py                                  # Обработка ошибок
  ┃ ┣ 📜 logger.py
  ┃ ┗ 📜 security.py
  ┃
@@ -38,7 +51,7 @@ backend/
 ### Infrastructure & Storage
 ```text
 root/
- ┣ 📂 [nginx](../nginx/README.md)             # Конфигурация прокси
+ ┣ 📂 [nginx](../nginx/index.md)              # Конфигурация прокси
  ┃ ┗ 📜 nginx.conf
  ┃
  ┗ 📂 data              # Persistent Storage (Volumes)
