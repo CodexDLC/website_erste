@@ -15,12 +15,12 @@ backend/
  ┃ ┣ 📜 logger.py
  ┃ ┗ 📜 security.py
  ┃
- ┣ 📂 database                                         # Слой данных (Infrastructure)
+ ┣ 📂 [database](./architecture/database/index.md)     # Слой данных (Infrastructure)
  ┃ ┣ 📂 models                                         # SQLAlchemy Models (Таблицы БД)
  ┃ ┗ 📂 repositories                                   # Реализация репозиториев
  ┃
  ┣ 📂 [apps](./architecture/index.md)                  # Доменный слой (Бизнес-фичи)
- ┃ ┣ 📂 [users](./architecture/domains/users.md)       # Домен: Пользователи
+ ┃ ┣ 📂 [users](./architecture/domains/users/index.md) # Домен: Пользователи
  ┃ ┃ ┣ 📂 api                                          # Controllers (Routers)
  ┃ ┃ ┣ 📂 contracts                                    # Interfaces (Repository Protocols)
  ┃ ┃ ┣ 📂 services                                     # Business Logic

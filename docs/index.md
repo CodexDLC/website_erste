@@ -10,7 +10,7 @@
 ### 🎨 [Frontend Documentation](./frontend/index.md)
 Описание UI, стилей и клиентской логики.
 
-### 🌐 [Nginx & Deployment](../nginx/README.md)
+### 🌐 [Nginx & Deployment](./nginx/index.md)
 Конфигурация серверов и инструкции по деплою.
 
 ---

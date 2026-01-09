@@ -9,7 +9,7 @@ from .core.config import settings
 from .core.exceptions import BaseAPIException, api_exception_handler
 from .core.database import async_engine
 from .core.logger import setup_loguru
-from .router import api_router
+from .router import api_router, tags_metadata
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -31,6 +31,7 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     version="1.0.0",
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    openapi_tags=tags_metadata,  # Подключаем описания тегов
     lifespan=lifespan,
 )
 
@@ -54,4 +55,3 @@ async def health_check():
 @app.get("/", tags=["System"])
 async def root():
     return {"message": "Welcome to PinLite API. Go to /docs for Swagger."}
-
