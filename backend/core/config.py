@@ -1,7 +1,8 @@
 # backend/core/config.py
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import computed_field
+from pydantic import computed_field, field_validator
+import json
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -41,7 +42,17 @@ class Settings(BaseSettings):
         return self.LOG_DIR / "errors.json"
 
     # === CORS ===
-    ALLOWED_ORIGINS: list[str] = ["http://localhost", "http://localhost:8000"]
+    ALLOWED_ORIGINS: str | list[str] = '["http://localhost"]'
+    
+    @field_validator('ALLOWED_ORIGINS', mode='before')
+    @classmethod
+    def parse_origins(cls, v):
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                return [v]  # Если одна строка без JSON
+        return v
 
 settings = Settings()
 

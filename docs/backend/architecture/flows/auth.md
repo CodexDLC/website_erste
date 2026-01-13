@@ -34,7 +34,7 @@
 2.  **Server:**
     *   Проверяет пароль.
     *   Генерирует `access_token` (JWT).
-    *   Генерирует `refresh_token` (random string).
+    *   Генерирует `refresh_token` (используйте `secrets.token_urlsafe(32)` (256 бит энтропии)).
     *   **DB:** Записывает `refresh_token` + `user_id` + `expires_at` в таблицу `refresh_tokens`.
 3.  **Client:** Получает пару токенов, сохраняет Access в память, Refresh в LocalStorage.
 
