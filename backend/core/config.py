@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     DEBUG: bool = False
 
+    # === Security ===
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 30
+
     # === Database ===
     DATABASE_URL: str 
 
