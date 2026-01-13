@@ -19,34 +19,40 @@ from backend.database.models.models import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
+
 def get_user_repository(
-    db: Annotated[AsyncSession, Depends(get_db)]
+    db: Annotated[AsyncSession, Depends(get_db)],
 ) -> IUserRepository:
     """
     Dependency provider for User Repository.
     """
     return UserRepository(session=db)
 
+
 def get_token_repository(
-    db: Annotated[AsyncSession, Depends(get_db)]
+    db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ITokenRepository:
     """
     Dependency provider for Token Repository.
     """
     return TokenRepository(session=db)
 
+
 def get_auth_service(
     user_repository: Annotated[IUserRepository, Depends(get_user_repository)],
-    token_repository: Annotated[ITokenRepository, Depends(get_token_repository)]
+    token_repository: Annotated[ITokenRepository, Depends(get_token_repository)],
 ) -> AuthService:
     """
     Dependency provider for Auth Service.
     """
-    return AuthService(user_repository=user_repository, token_repository=token_repository)
+    return AuthService(
+        user_repository=user_repository, token_repository=token_repository
+    )
+
 
 async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
-    auth_service: Annotated[AuthService, Depends(get_auth_service)]
+    auth_service: Annotated[AuthService, Depends(get_auth_service)],
 ) -> User:
     """
     Dependency to get the current authenticated user from the JWT token.
@@ -60,9 +66,9 @@ async def get_current_user(
         token_data = TokenPayload(sub=email)
     except JWTError:
         raise AuthException(detail="Could not validate credentials")
-    
+
     user = await auth_service.user_repository.get_by_email(email=token_data.sub)
     if user is None:
         raise AuthException(detail="User not found")
-    
+
     return user

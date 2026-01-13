@@ -10,10 +10,12 @@ from backend.apps.users.dependencies import get_auth_service
 
 router = APIRouter()
 
-@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+
+@router.post(
+    "/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED
+)
 async def register_new_user(
-    user_in: UserCreate,
-    auth_service: AuthService = Depends(get_auth_service)
+    user_in: UserCreate, auth_service: AuthService = Depends(get_auth_service)
 ):
     """
     Register a new user.
@@ -21,28 +23,29 @@ async def register_new_user(
     logger.info(f"AuthRouter | action=register_request email={user_in.email}")
     return await auth_service.register_user(user_in)
 
+
 @router.post("/login", response_model=Token)
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
-    auth_service: AuthService = Depends(get_auth_service)
+    auth_service: AuthService = Depends(get_auth_service),
 ):
     """
     OAuth2 compatible token login.
     """
     logger.info(f"AuthRouter | action=login_request email={form_data.username}")
-    
+
     user = await auth_service.authenticate_user(form_data.username, form_data.password)
     if not user:
         raise AuthException(detail="Incorrect email or password")
-    
+
     tokens = await auth_service.create_tokens(user)
-    
+
     return tokens
+
 
 @router.post("/refresh", response_model=Token)
 async def refresh_token(
-    token_in: RefreshTokenRequest,
-    auth_service: AuthService = Depends(get_auth_service)
+    token_in: RefreshTokenRequest, auth_service: AuthService = Depends(get_auth_service)
 ):
     """
     Get new access/refresh tokens.
@@ -50,10 +53,10 @@ async def refresh_token(
     logger.info("AuthRouter | action=refresh_request")
     return await auth_service.refresh_token(token_in.refresh_token)
 
+
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(
-    token_in: RefreshTokenRequest,
-    auth_service: AuthService = Depends(get_auth_service)
+    token_in: RefreshTokenRequest, auth_service: AuthService = Depends(get_auth_service)
 ):
     """
     Logout user.

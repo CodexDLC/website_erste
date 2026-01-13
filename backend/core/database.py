@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.exc import SQLAlchemyError
 from loguru import logger as log
 
@@ -38,7 +37,7 @@ pool_settings: dict[str, Any] = {
 # We disable echo because we handle logging via Loguru interceptor
 async_engine = create_async_engine(
     db_url,
-    echo=False, # Changed from settings.DEBUG to False to avoid duplicate logs
+    echo=False,  # Changed from settings.DEBUG to False to avoid duplicate logs
     connect_args=connect_args,
     **pool_settings,
 )
@@ -60,6 +59,7 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             raise e
         finally:
             await session.close()
+
 
 async def create_db_tables() -> None:
     try:

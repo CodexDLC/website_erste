@@ -2,11 +2,10 @@ from typing import Optional
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from loguru import logger
 
-from backend.apps.users.contracts.user_repository import IUserRepository
 from backend.database.models.models import User
 from backend.apps.users.schemas.user import UserCreate
+
 
 class UserRepository:
     """
