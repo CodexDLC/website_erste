@@ -1,7 +1,8 @@
 # backend/router.py
 from fastapi import APIRouter
 
-# from backend.apps.users.routers import user_router
+from backend.apps.users.api.auth import router as auth_router
+from backend.apps.users.api.users import router as users_router
 # from backend.apps.media.routers import media_router
 
 api_router = APIRouter()
@@ -13,8 +14,12 @@ tags_metadata = [
         "description": "Health check and system info.",
     },
     {
+        "name": "Auth",
+        "description": "Authentication: **register**, **login**, **refresh**.",
+    },
+    {
         "name": "Users",
-        "description": "Operations with users: **registration**, **login**, **profile**.",
+        "description": "Operations with users: **profile**.",
     },
     {
         "name": "Media",
@@ -22,9 +27,6 @@ tags_metadata = [
     },
 ]
 
-# api_router.include_router(user_router, prefix="/users", tags=["Users"])
+api_router.include_router(auth_router, prefix="/auth", tags=["Auth"])
+api_router.include_router(users_router, prefix="/users", tags=["Users"])
 # api_router.include_router(media_router, prefix="/media", tags=["Media"])
-
-@api_router.get("/health", tags=["System"])
-async def health_check():
-    return {"status": "ok"}

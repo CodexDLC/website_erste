@@ -6,12 +6,10 @@ import json
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=False,
-        extra="ignore"
+        env_file=".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore"
     )
 
     # === Main ===
@@ -20,8 +18,12 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     DEBUG: bool = False
 
+    # === Security ===
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 30
+
     # === Database ===
-    DATABASE_URL: str 
+    DATABASE_URL: str
 
     # === Storage ===
     UPLOAD_DIR: Path = BASE_DIR / "data" / "uploads"
@@ -43,8 +45,8 @@ class Settings(BaseSettings):
 
     # === CORS ===
     ALLOWED_ORIGINS: str | list[str] = '["http://localhost"]'
-    
-    @field_validator('ALLOWED_ORIGINS', mode='before')
+
+    @field_validator("ALLOWED_ORIGINS", mode="before")
     @classmethod
     def parse_origins(cls, v):
         if isinstance(v, str):
@@ -53,6 +55,7 @@ class Settings(BaseSettings):
             except json.JSONDecodeError:
                 return [v]  # Если одна строка без JSON
         return v
+
 
 settings = Settings()
 

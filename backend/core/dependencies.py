@@ -8,10 +8,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .database import get_db
 from .config import settings, Settings
 
+
 @dataclass
 class APIContext:
     db: AsyncSession
     settings: Settings
+
 
 async def get_context(
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -20,5 +22,6 @@ async def get_context(
         db=db,
         settings=settings,
     )
+
 
 Ctx = Annotated[APIContext, Depends(get_context)]

@@ -15,6 +15,22 @@
 | **created_at** | `DateTime` | Дата регистрации. |
 | **updated_at** | `DateTime` | Дата последнего обновления профиля. |
 
+## Таблица `social_accounts`
+Привязка внешних аккаунтов (OAuth2) к пользователю. Один пользователь может иметь несколько соцсетей.
+
+| Поле | Тип | Описание |
+| :--- | :--- | :--- |
+| **id** | `BigInt` (PK) | Инкрементальный ID. |
+| **user_id** | `UUID` (FK -> users.id) | Владелец аккаунта. `ON DELETE CASCADE`. |
+| **provider** | `String` | Название провайдера (google, github, discord). |
+| **provider_id** | `String` | Уникальный ID пользователя в системе провайдера (sub). |
+| **email** | `String` (Optional) | Email, полученный от провайдера (для справки). |
+| **created_at** | `DateTime` | Дата привязки. |
+
+### Индексы таблицы `social_accounts`:
+- `idx_provider_pid` - Unique Index на пару `(provider, provider_id)` (защита от дублей).
+- `idx_user_id` - Index на поле `user_id` (быстрый поиск всех соцсетей юзера).
+
 ## Таблица `refresh_tokens`
 Хранилище активных сессий (White List). Используется для обновления Access Token.
 

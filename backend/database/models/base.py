@@ -14,21 +14,22 @@ convention = {
     "pk": "pk_%(table_name)s",
 }
 
+
 class Base(DeclarativeBase):
     """Главный класс, от которого наследуются все таблицы."""
+
     metadata = MetaData(naming_convention=convention)
+
 
 class TimestampMixin:
     """
     Миксин для добавления полей created_at и updated_at.
     Использование: class User(Base, TimestampMixin): ...
     """
+
     created_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(),
-        nullable=False
+        server_default=func.now(), nullable=False
     )
     updated_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(),
-        onupdate=func.now(),
-        nullable=False
+        server_default=func.now(), onupdate=func.now(), nullable=False
     )

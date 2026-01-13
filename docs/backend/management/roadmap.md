@@ -11,18 +11,18 @@
 - [x] **Environment:** Docker setup, .env, requirements.
 - [x] **Documentation:** Базовая структура документации.
 
-## 🚧 Phase 2: Users Domain (В работе)
+## ✅ Phase 2: Users Domain (Завершено)
 Реализация системы пользователей и авторизации.
-- [ ] **Database Models:** Таблица `users` (SQLAlchemy).
-- [ ] **Schemas:** Pydantic модели (UserCreate, UserLogin, UserResponse).
-- [ ] **Repositories:** CRUD операции для пользователей.
-- [ ] **Services:**
-    - [ ] Registration (Hashing password).
-    - [ ] Authentication (JWT Token generation).
-- [ ] **API Routers:** Эндпоинты `/auth/register`, `/auth/login`, `/users/me`.
-- [ ] **Quality Control:** Прохождение проверок `ruff` и `mypy`.
+- [x] **Database Models:** Таблица `users` (SQLAlchemy).
+- [x] **Schemas:** Pydantic модели (UserCreate, UserLogin, UserResponse).
+- [x] **Repositories:** CRUD операции для пользователей.
+- [x] **Services:**
+    - [x] Registration (Hashing password).
+    - [x] Authentication (JWT Token generation).
+- [x] **API Routers:** Эндпоинты `/auth/register`, `/auth/login`, `/users/me`.
+- [x] **Quality Control:** Прохождение проверок `ruff` и `mypy` (Basic checks passed).
 
-## 📅 Phase 3: Media Domain & Storage
+## 🚧 Phase 3: Media Domain & Storage (В работе)
 Реализация ядра проекта — хостинга изображений.
 - [ ] **Database Models:** Таблицы `files` (CAS) и `images` (Meta).
 - [ ] **Storage Logic:**
