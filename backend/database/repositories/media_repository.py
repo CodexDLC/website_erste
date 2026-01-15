@@ -1,9 +1,8 @@
-from typing import Optional, List
 from uuid import UUID
 
-from sqlalchemy import select, delete, update
-from sqlalchemy.orm import selectinload
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from backend.database.models import File, Image
 
@@ -18,7 +17,7 @@ class MediaRepository:
 
     # --- File Operations (CAS) ---
 
-    async def get_file_by_hash(self, file_hash: str) -> Optional[File]:
+    async def get_file_by_hash(self, file_hash: str) -> File | None:
         """
         Check if a file with this hash already exists (Deduplication).
         """
@@ -26,9 +25,7 @@ class MediaRepository:
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def create_file(
-        self, hash: str, size_bytes: int, mime_type: str, path: str
-    ) -> File:
+    async def create_file(self, hash: str, size_bytes: int, mime_type: str, path: str) -> File:
         """
         Register a new physical file in the database.
         Initial ref_count is 0 (will be incremented when Image is created).
@@ -71,11 +68,7 @@ class MediaRepository:
         self.session.add(image)
 
         # 2. Increment File ref_count
-        stmt = (
-            update(File)
-            .where(File.hash == file_hash)
-            .values(ref_count=File.ref_count + 1)
-        )
+        stmt = update(File).where(File.hash == file_hash).values(ref_count=File.ref_count + 1)
         await self.session.execute(stmt)
 
         await self.session.flush()
@@ -83,25 +76,21 @@ class MediaRepository:
 
         # Explicitly load the file relationship to avoid lazy loading issues later
         # This is a bit of a hack, usually we return what we created, but for consistency:
-        stmt_load = (
-            select(Image).where(Image.id == image.id).options(selectinload(Image.file))
-        )
+        stmt_load = select(Image).where(Image.id == image.id).options(selectinload(Image.file))
         result = await self.session.execute(stmt_load)
         return result.scalar_one()
 
-    async def get_image_by_id(self, image_id: UUID) -> Optional[Image]:
+    async def get_image_by_id(self, image_id: UUID) -> Image | None:
         """
         Get image metadata by ID.
         """
         stmt = (
-            select(Image)
-            .where(Image.id == image_id)
-            .options(selectinload(Image.file))  # Eager load File
+            select(Image).where(Image.id == image_id).options(selectinload(Image.file))  # Eager load File
         )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_public_images(self, limit: int, offset: int) -> List[Image]:
+    async def get_public_images(self, limit: int, offset: int) -> list[Image]:
         """
         Get gallery for public feed.
         """
@@ -115,9 +104,7 @@ class MediaRepository:
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_images_by_user(
-        self, user_id: UUID, limit: int, offset: int
-    ) -> List[Image]:
+    async def get_images_by_user(self, user_id: UUID, limit: int, offset: int) -> list[Image]:
         """
         Get gallery for a specific user.
         """
@@ -144,11 +131,7 @@ class MediaRepository:
 
         if file_hash:
             # 2. Decrement File ref_count
-            stmt_update = (
-                update(File)
-                .where(File.hash == file_hash)
-                .values(ref_count=File.ref_count - 1)
-            )
+            stmt_update = update(File).where(File.hash == file_hash).values(ref_count=File.ref_count - 1)
             await self.session.execute(stmt_update)
 
         # 3. Delete Image

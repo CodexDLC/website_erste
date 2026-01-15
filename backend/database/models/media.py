@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import String, Integer, DateTime, ForeignKey
+from sqlalchemy import DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
@@ -29,9 +29,7 @@ class File(Base):
     # Reference counting for Garbage Collection
     ref_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
     images = relationship("Image", back_populates="file")
@@ -51,20 +49,14 @@ class Image(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
 
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
-    )
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
 
     # Link to physical file (CAS)
-    file_hash: Mapped[str] = mapped_column(
-        ForeignKey("files.hash", ondelete="RESTRICT"), nullable=False, index=True
-    )
+    file_hash: Mapped[str] = mapped_column(ForeignKey("files.hash", ondelete="RESTRICT"), nullable=False, index=True)
 
     filename: Mapped[str] = mapped_column(String, nullable=False)
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
     file = relationship("File", back_populates="images")

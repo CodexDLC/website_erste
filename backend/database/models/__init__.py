@@ -1,6 +1,6 @@
 from .base import Base
-from .users import User, SocialAccount, RefreshToken
 from .media import File, Image
+from .users import RefreshToken, SocialAccount, User
 
 __all__ = [
     "Base",

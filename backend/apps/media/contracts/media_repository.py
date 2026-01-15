@@ -1,4 +1,4 @@
-from typing import Optional, Protocol, List
+from typing import Protocol
 from uuid import UUID
 
 from backend.database.models import File, Image
@@ -11,15 +11,13 @@ class IMediaRepository(Protocol):
     """
 
     # --- File Operations (CAS) ---
-    async def get_file_by_hash(self, file_hash: str) -> Optional[File]:
+    async def get_file_by_hash(self, file_hash: str) -> File | None:
         """
         Check if a file with this hash already exists (Deduplication).
         """
         ...
 
-    async def create_file(
-        self, hash: str, size_bytes: int, mime_type: str, path: str
-    ) -> File:
+    async def create_file(self, hash: str, size_bytes: int, mime_type: str, path: str) -> File:
         """
         Register a new physical file in the database.
         """
@@ -44,21 +42,19 @@ class IMediaRepository(Protocol):
         """
         ...
 
-    async def get_image_by_id(self, image_id: UUID) -> Optional[Image]:
+    async def get_image_by_id(self, image_id: UUID) -> Image | None:
         """
         Get image metadata by ID.
         """
         ...
 
-    async def get_public_images(self, limit: int, offset: int) -> List[Image]:
+    async def get_public_images(self, limit: int, offset: int) -> list[Image]:
         """
         Get gallery for public feed.
         """
         ...
 
-    async def get_images_by_user(
-        self, user_id: UUID, limit: int, offset: int
-    ) -> List[Image]:
+    async def get_images_by_user(self, user_id: UUID, limit: int, offset: int) -> list[Image]:
         """
         Get gallery for a specific user.
         """

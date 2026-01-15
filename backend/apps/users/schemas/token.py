@@ -1,4 +1,3 @@
-from typing import Optional
 from pydantic import BaseModel
 
 
@@ -17,8 +16,8 @@ class TokenPayload(BaseModel):
     Schema for JWT Token payload.
     """
 
-    sub: Optional[str] = None
-    exp: Optional[int] = None
+    sub: str | None = None
+    exp: int | None = None
 
 
 class RefreshTokenRequest(BaseModel):

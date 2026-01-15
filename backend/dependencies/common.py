@@ -5,8 +5,8 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.core.config import Settings, settings
 from backend.core.database import get_db
-from backend.core.config import settings, Settings
 
 
 @dataclass

@@ -1,13 +1,12 @@
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from sqlalchemy import (
-    String,
+    BigInteger,
     Boolean,
     DateTime,
     ForeignKey,
-    BigInteger,
+    String,
     UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column
@@ -30,12 +29,8 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), onupdate=func.now(), nullable=True
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
 
     # Relationships
     # TODO: Uncomment after full refactoring and resolving circular imports
@@ -56,25 +51,15 @@ class SocialAccount(Base):
     __tablename__ = "social_accounts"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
-    )
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     provider: Mapped[str] = mapped_column(String, nullable=False)  # e.g., "google"
-    provider_id: Mapped[str] = mapped_column(
-        String, nullable=False
-    )  # e.g., "1234567890" from Google
-    email: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    provider_id: Mapped[str] = mapped_column(String, nullable=False)  # e.g., "1234567890" from Google
+    email: Mapped[str | None] = mapped_column(String, nullable=True)
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     # Constraints
-    __table_args__ = (
-        UniqueConstraint(
-            "provider", "provider_id", name="uix_social_account_provider_pid"
-        ),
-    )
+    __table_args__ = (UniqueConstraint("provider", "provider_id", name="uix_social_account_provider_pid"),)
 
     # Relationships
     # TODO: Uncomment after full refactoring
@@ -93,16 +78,10 @@ class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
-    )
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     token: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
-    expires_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
-    )
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
     # TODO: Uncomment after full refactoring

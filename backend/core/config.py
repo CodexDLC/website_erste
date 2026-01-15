@@ -1,16 +1,15 @@
 # backend/core/config.py
-from pathlib import Path
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import computed_field, field_validator
 import json
+from pathlib import Path
+
+from pydantic import computed_field, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore"
-    )
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore")
 
     # === Main ===
     PROJECT_NAME: str = "PinLite"

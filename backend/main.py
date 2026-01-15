@@ -6,8 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
 from .core.config import settings
-from .core.exceptions import BaseAPIException, api_exception_handler
 from .core.database import async_engine, create_db_tables
+from .core.exceptions import BaseAPIException, api_exception_handler
 from .core.logger import setup_loguru
 from .router import api_router, tags_metadata
 
