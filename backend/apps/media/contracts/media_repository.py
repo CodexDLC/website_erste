@@ -17,7 +17,9 @@ class IMediaRepository(Protocol):
         """
         ...
 
-    async def create_file(self, hash: str, size_bytes: int, mime_type: str, path: str) -> File:
+    async def create_file(
+        self, hash: str, size_bytes: int, mime_type: str, path: str
+    ) -> File:
         """
         Register a new physical file in the database.
         """
@@ -53,8 +55,10 @@ class IMediaRepository(Protocol):
         Get gallery for public feed.
         """
         ...
-    
-    async def get_images_by_user(self, user_id: UUID, limit: int, offset: int) -> List[Image]:
+
+    async def get_images_by_user(
+        self, user_id: UUID, limit: int, offset: int
+    ) -> List[Image]:
         """
         Get gallery for a specific user.
         """
