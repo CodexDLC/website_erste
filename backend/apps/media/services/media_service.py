@@ -11,6 +11,7 @@ from aiofiles import os as aios
 from fastapi import UploadFile
 from starlette.concurrency import run_in_threadpool
 from loguru import logger
+from PIL import Image as PILImage
 
 from backend.core.config import settings
 from backend.core.exceptions import (
@@ -85,6 +86,13 @@ class MediaService:
                 # На всякий случай приводим к str для run_in_threadpool
                 await run_in_threadpool(shutil.move, str(temp_path), str(target_path))
 
+                # 4.1 Генерируем миниатюру (Thumbnail)
+                try:
+                    await self._generate_thumbnail(target_path, file_hash)
+                except Exception as e:
+                    logger.error(f"Failed to generate thumbnail for {file_hash}: {e}")
+                    # Не прерываем загрузку, если миниатюра не создалась, но логируем
+
                 # 5. Создаем записи в БД
                 # Сначала регистрируем физический файл
                 await self.repository.create_file(
@@ -132,6 +140,7 @@ class MediaService:
         """
         Delete an image.
         Checks ownership before deletion.
+        Implements Garbage Collection (GC) for physical files.
         """
         image = await self.repository.get_image_by_id(image_id)
         if not image:
@@ -140,7 +149,28 @@ class MediaService:
         if image.user_id != user_id:
             raise PermissionDeniedException(detail="You do not own this image")
 
+        file_hash = image.file_hash
+        
+        # 1. Удаляем ссылку пользователя (Image)
+        # Внутри репозитория это также уменьшит ref_count у File
         await self.repository.delete_image(image_id)
+        
+        # 2. Проверяем использование файла (GC)
+        usage_count = await self.repository.get_usage_count(file_hash)
+        
+        if usage_count == 0:
+            logger.info(f"GC: File {file_hash} is no longer used. Deleting physical files.")
+            
+            # Удаляем запись о файле из БД
+            await self.repository.delete_file(file_hash)
+            
+            # Удаляем физические файлы (оригинал и миниатюру)
+            original_path = self._get_storage_path(file_hash)
+            thumb_path = self._get_thumbnail_path(file_hash)
+            
+            await self._remove_file(original_path)
+            await self._remove_file(thumb_path)
+        
         await self.repository.commit()
         logger.info(f"Image {image_id} deleted by user {user_id}")
 
@@ -191,6 +221,35 @@ class MediaService:
         os.makedirs(shard, exist_ok=True)
 
         return shard / file_hash
+
+    def _get_thumbnail_path(self, file_hash: str) -> Path:
+        """
+        Generate path for thumbnail: root/storage/a1/b2/a1b2c3d4..._thumb.jpg
+        """
+        original_path = self._get_storage_path(file_hash)
+        return original_path.parent / f"{file_hash}_thumb.jpg"
+
+    async def _generate_thumbnail(self, original_path: Path, file_hash: str):
+        """
+        Generates a thumbnail for the image using Pillow.
+        Runs in a threadpool to avoid blocking the event loop.
+        """
+        thumb_path = self._get_thumbnail_path(file_hash)
+        
+        def _process():
+            with PILImage.open(original_path) as img:
+                # Convert to RGB if necessary (e.g. for PNGs with transparency)
+                if img.mode in ("RGBA", "P"):
+                    img = img.convert("RGB")
+                
+                # Resize keeping aspect ratio (max 300px on large side)
+                img.thumbnail((300, 300))
+                
+                # Save as JPG
+                img.save(thumb_path, "JPEG", quality=85)
+        
+        await run_in_threadpool(_process)
+        logger.debug(f"Thumbnail generated for {file_hash}")
 
     @staticmethod
     async def _remove_file(path: Path):

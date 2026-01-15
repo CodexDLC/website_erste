@@ -1,4 +1,5 @@
 from typing import Annotated
+import uuid
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -61,14 +62,21 @@ async def get_current_user(
     """
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
+        user_id_str: str = payload.get("sub")
+        if user_id_str is None:
             raise AuthException(detail="Could not validate credentials")
-        token_data = TokenPayload(sub=email)
+
+        try:
+            user_id = uuid.UUID(user_id_str)
+        except ValueError:
+            raise AuthException(detail="Invalid token subject")
+            
+        token_data = TokenPayload(sub=user_id_str)
     except JWTError:
         raise AuthException(detail="Could not validate credentials")
 
-    user = await auth_service.user_repository.get_by_email(email=token_data.sub)
+    # Fix: Use get_by_id instead of get_by_email
+    user = await auth_service.user_repository.get_by_id(user_id=user_id)
     if user is None:
         raise AuthException(detail="User not found")
 
