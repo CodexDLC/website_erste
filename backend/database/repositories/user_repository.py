@@ -3,8 +3,9 @@ import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from backend.database.models.models import User
+
 from backend.apps.users.schemas.user import UserCreate
+from backend.database.models import User
 
 
 class UserRepository:
@@ -44,6 +45,9 @@ class UserRepository:
             is_superuser=False,
         )
         self.session.add(db_user)
-        await self.session.commit()
+        await self.session.flush()
         await self.session.refresh(db_user)
         return db_user
+
+    async def commit(self) -> None:
+        await self.session.commit()

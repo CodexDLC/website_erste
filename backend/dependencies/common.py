@@ -1,12 +1,12 @@
-# backend/core/dependencies.py
+# backend/core/auth.py
 from dataclasses import dataclass
 from typing import Annotated
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .database import get_db
-from .config import settings, Settings
+from backend.core.database import get_db
+from backend.core.config import settings, Settings
 
 
 @dataclass

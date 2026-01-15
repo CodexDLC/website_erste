@@ -2,7 +2,7 @@ from typing import Optional, Protocol
 import uuid
 from datetime import datetime
 
-from backend.database.models.models import RefreshToken
+from backend.database.models import RefreshToken
 
 
 class ITokenRepository(Protocol):
@@ -33,5 +33,11 @@ class ITokenRepository(Protocol):
     async def delete_all_for_user(self, user_id: uuid.UUID) -> None:
         """
         Delete all tokens for a user (logout from all devices).
+        """
+        ...
+
+    async def commit(self) -> None:
+        """
+        Commit the current transaction.
         """
         ...

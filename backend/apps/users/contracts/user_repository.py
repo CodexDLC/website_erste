@@ -1,7 +1,8 @@
 from typing import Optional, Protocol
 import uuid
-from backend.database.models.models import User
+
 from backend.apps.users.schemas.user import UserCreate
+from backend.database.models import User
 
 
 class IUserRepository(Protocol):
@@ -43,5 +44,11 @@ class IUserRepository(Protocol):
 
         Returns:
             The created User object.
+        """
+        ...
+
+    async def commit(self) -> None:
+        """
+        Commit the current transaction.
         """
         ...

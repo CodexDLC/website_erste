@@ -13,7 +13,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
-from backend.core.database import Base
+from .base import Base
 
 
 class User(Base):
@@ -38,8 +38,10 @@ class User(Base):
     )
 
     # Relationships
+    # TODO: Uncomment after full refactoring and resolving circular imports
     # refresh_tokens = relationship("RefreshToken", back_populates="user", cascade="all, delete-orphan")
     # social_accounts = relationship("SocialAccount", back_populates="user", cascade="all, delete-orphan")
+    # images = relationship("Image", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, email={self.email})>"
@@ -75,6 +77,7 @@ class SocialAccount(Base):
     )
 
     # Relationships
+    # TODO: Uncomment after full refactoring
     # user = relationship("User", back_populates="social_accounts")
 
     def __repr__(self) -> str:
@@ -102,6 +105,7 @@ class RefreshToken(Base):
     )
 
     # Relationships
+    # TODO: Uncomment after full refactoring
     # user = relationship("User", back_populates="refresh_tokens")
 
     def __repr__(self) -> str:
