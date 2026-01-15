@@ -1,46 +1,56 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Image Hosting</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="css/main.css">
-</head>
-<body>
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/main.css" />
+  </head>
+  <body>
     <div class="container">
-        <div class="header">
-            <h1><a href="index.html">Upload Photos</a></h1>
-            <h2>Upload selfies, memes, or any fun pictures here.</h2>
-            <a href="upload_form.html" class="showcase-btn">Tail-ent Showcase</a>
-        </div>
-        
-        <div class="animals" id="mascot-placeholder">
-            <img src="data/img/cat.png" alt="Random Mascot">
-        </div>
+      <div class="header">
+        <h1><a href="index.html">Upload Photos</a></h1>
+        <h2>Upload selfies, memes, or any fun pictures here.</h2>
+        <a href="upload_form.html" class="showcase-btn">Tail-ent Showcase</a>
+      </div>
 
-        <div id="home-gallery-grid" class="smart-gallery" style="display: none;"></div>
+      <div class="animals" id="mascot-placeholder">
+        <img src="data/img/cat.png" alt="Random Mascot" />
+      </div>
 
-        <div id="image-viewer" class="image-viewer" style="display: none;">
-            <div class="viewer-content">
-                <img id="viewer-img" src="" alt="Full View">
-                <h3 id="viewer-title">Filename.jpg</h3>
-                
-                <div class="viewer-controls">
-                    <button class="btn-back" id="btn-back-gallery">← Back to Gallery</button>
-                    <button class="btn-copy" id="btn-copy-url">Copy URL</button>
-                </div>
-            </div>
+      <div
+        id="home-gallery-grid"
+        class="smart-gallery"
+        style="display: none"
+      ></div>
+
+      <div id="image-viewer" class="image-viewer" style="display: none">
+        <div class="viewer-content">
+          <img id="viewer-img" src="" alt="Full View" />
+          <h3 id="viewer-title">Filename.jpg</h3>
+
+          <div class="viewer-controls">
+            <button class="btn-back" id="btn-back-gallery">
+              ← Back to Gallery
+            </button>
+            <button class="btn-copy" id="btn-copy-url">Copy URL</button>
+          </div>
         </div>
+      </div>
     </div>
 
     <script src="js/storage.js"></script>
     <script src="js/index.js"></script>
-
-</body>
+  </body>
 </html>

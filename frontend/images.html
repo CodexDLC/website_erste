@@ -1,44 +1,49 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gallery - Image Hosting</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/upload.css">
-    <link rel="stylesheet" href="css/gallery.css">
-</head>
-<body>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Inter:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
 
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/upload.css" />
+    <link rel="stylesheet" href="css/gallery.css" />
+  </head>
+  <body>
     <div class="upload-wrapper">
-        <div class="header">
-            <h1><a href="index.html">Upload Photos</a></h1>
-            <h2>Upload selfies, memes, or any fun pictures here.</h2>
+      <div class="header">
+        <h1><a href="index.html">Upload Photos</a></h1>
+        <h2>Upload selfies, memes, or any fun pictures here.</h2>
+      </div>
+
+      <nav class="nav-tabs">
+        <button
+          class="tab-link"
+          onclick="window.location.href = 'upload_form.html'"
+        >
+          Upload
+        </button>
+        <button class="tab-link active">Images</button>
+      </nav>
+
+      <div class="gallery-container">
+        <div class="list-header">
+          <div class="col col-name">Name</div>
+          <div class="col col-url">Url</div>
+          <div class="col col-action">Actions</div>
         </div>
 
-        <nav class="nav-tabs">
-            <button class="tab-link" onclick="window.location.href='upload_form.html'">Upload</button>
-            <button class="tab-link active">Images</button>
-        </nav>
-
-        <div class="gallery-container">
-            <div class="list-header">
-                <div class="col col-name">Name</div>
-                <div class="col col-url">Url</div>
-                <div class="col col-action">Actions</div>
-            </div>
-
-            <div id="gallery-list">
-                </div>
-        </div>
+        <div id="gallery-list"></div>
+      </div>
     </div>
 
     <script src="js/storage.js"></script>
     <script src="js/images.js"></script>
-
-</body>
+  </body>
 </html>

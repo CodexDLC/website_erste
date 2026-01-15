@@ -1,56 +1,74 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Upload - Image Hosting</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/upload.css">
-</head>
-<body>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Inter:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
 
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/upload.css" />
+  </head>
+  <body>
     <div class="upload-wrapper">
-        <div class="header">
-            <h1><a href="index.html">Upload Photos</a></h1>
-            <h2>Upload selfies, memes, or any fun pictures here.</h2>
-        </div>
-        
-        <nav class="nav-tabs">
-            <button class="tab-link active">Upload</button>
-            
-            <button class="tab-link" id="gallery-tab-btn" onclick="window.location.href='images.html'" style="display: none;">
-                Images
-            </button>
-        </nav>
+      <div class="header">
+        <h1><a href="index.html">Upload Photos</a></h1>
+        <h2>Upload selfies, memes, or any fun pictures here.</h2>
+      </div>
 
-        <div class="drop-area" id="drop-zone">
-            <div class="drop-icon">
-                <img src="data/img/cloud-icon.png" alt="upload" onerror="this.style.display='none'">
-            </div>
-            <p class="drop-text">Select a file or drag and drop here</p>
-            <p class="drop-text" style="font-size: 0.8rem; margin-top: 5px;">JPG, PNG, GIF up to 5MB</p>
-        </div>
+      <nav class="nav-tabs">
+        <button class="tab-link active">Upload</button>
 
-        <input type="file" id="file-input-field" accept="image/*" multiple style="display: none;">
-        <label for="file-input-field" class="browse-btn">
-            Browse your file
-        </label>
+        <button
+          class="tab-link"
+          id="gallery-tab-btn"
+          onclick="window.location.href = 'images.html'"
+          style="display: none"
+        >
+          Images
+        </button>
+      </nav>
 
-        <div class="input-group">
-            <div class="input-label">Current Upload</div>
-            <div class="link-box">
-                <input type="text" id="result-link" placeholder="https://" readonly>
-                <button class="copy-btn" id="copy-btn">COPY</button>
-            </div>
+      <div class="drop-area" id="drop-zone">
+        <div class="drop-icon">
+          <img
+            src="data/img/cloud-icon.png"
+            alt="upload"
+            onerror="this.style.display = 'none'"
+          />
         </div>
+        <p class="drop-text">Select a file or drag and drop here</p>
+        <p class="drop-text" style="font-size: 0.8rem; margin-top: 5px">
+          JPG, PNG, GIF up to 5MB
+        </p>
+      </div>
+
+      <input
+        type="file"
+        id="file-input-field"
+        accept="image/*"
+        multiple
+        style="display: none"
+      />
+      <label for="file-input-field" class="browse-btn">
+        Browse your file
+      </label>
+
+      <div class="input-group">
+        <div class="input-label">Current Upload</div>
+        <div class="link-box">
+          <input type="text" id="result-link" placeholder="https://" readonly />
+          <button class="copy-btn" id="copy-btn">COPY</button>
+        </div>
+      </div>
     </div>
 
     <script src="js/storage.js"></script>
     <script src="js/upload.js"></script>
-
-</body>
+  </body>
 </html>
