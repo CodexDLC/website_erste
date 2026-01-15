@@ -11,11 +11,12 @@ from backend.core.security import ALGORITHM
 from backend.core.exceptions import AuthException
 from backend.apps.users.contracts.user_repository import IUserRepository
 from backend.apps.users.contracts.token_repository import ITokenRepository
+from backend.database.models import User
 from backend.database.repositories.user_repository import UserRepository
 from backend.database.repositories.token_repository import TokenRepository
 from backend.apps.users.services.auth_service import AuthService
 from backend.apps.users.schemas.token import TokenPayload
-from backend.database.models.models import User
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 

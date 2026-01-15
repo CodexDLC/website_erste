@@ -6,7 +6,7 @@ from backend.core.exceptions import AuthException
 from backend.apps.users.schemas.user import UserCreate, UserResponse
 from backend.apps.users.schemas.token import Token, RefreshTokenRequest
 from backend.apps.users.services.auth_service import AuthService
-from backend.apps.users.dependencies import get_auth_service
+from backend.dependencies.auth import get_auth_service
 
 router = APIRouter()
 

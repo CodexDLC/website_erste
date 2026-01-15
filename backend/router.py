@@ -3,7 +3,7 @@ from fastapi import APIRouter
 
 from backend.apps.users.api.auth import router as auth_router
 from backend.apps.users.api.users import router as users_router
-# from backend.apps.media.routers import media_router
+from backend.apps.media.api.media import router as media_router
 
 api_router = APIRouter()
 
@@ -29,4 +29,4 @@ tags_metadata = [
 
 api_router.include_router(auth_router, prefix="/auth", tags=["Auth"])
 api_router.include_router(users_router, prefix="/users", tags=["Users"])
-# api_router.include_router(media_router, prefix="/media", tags=["Media"])
+api_router.include_router(media_router, prefix="/media", tags=["Media"])

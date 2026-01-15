@@ -1,4 +1,4 @@
-[🏠 Home](../../index.md) > [Nginx](./index.md)
+[🏠 Home](../../index.md) > [Nginx](index.md)
 
 # 🗺️ Routing Map
 

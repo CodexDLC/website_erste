@@ -1,4 +1,4 @@
-[🏠 Home](../../index.md) > [Backend](../index.md) > [Management](./index.md)
+[🏠 Home](../index.md) > [Management](./index.md)
 
 # 🗺️ Project Roadmap: PinLite
 
@@ -22,17 +22,18 @@
 - [x] **API Routers:** Эндпоинты `/auth/register`, `/auth/login`, `/users/me`.
 - [x] **Quality Control:** Прохождение проверок `ruff` и `mypy` (Basic checks passed).
 
-## 🚧 Phase 3: Media Domain & Storage (В работе)
+## ✅ Phase 3: Media Domain & Storage (Завершено)
 Реализация ядра проекта — хостинга изображений.
-- [ ] **Database Models:** Таблицы `files` (CAS) и `images` (Meta).
-- [ ] **Storage Logic:**
-    - [ ] CAS (Content-Addressable Storage) алгоритм.
-    - [ ] Валидация файлов (Magic bytes).
-- [ ] **Docker Volumes:** Настройка персистентного хранения (`data/uploads`).
-- [ ] **API Routers:** Загрузка (`/media/upload`), Галерея (`/media/feed`).
-- [ ] **Quality Control:** Прохождение проверок `ruff` и `mypy`.
+- [x] **Database Models:** Таблицы `files` (CAS) и `images` (Meta).
+- [x] **Storage Logic:**
+    - [x] CAS (Content-Addressable Storage) алгоритм.
+    - [x] Валидация файлов (Magic bytes / Size limit).
+    - [x] Deduplication (проверка хешей).
+- [x] **Docker Volumes:** Настройка персистентного хранения (`data/uploads`).
+- [x] **API Routers:** Загрузка (`/media/upload`), Галерея (`/media/feed`).
+- [x] **Quality Control:** Прохождение проверок `ruff` и `mypy`.
 
-## 📅 Phase 4: Frontend Integration (MVP Release)
+## 🚧 Phase 4: Frontend Integration (В работе)
 Связка фронтенда с реальным API.
 - [ ] **Auth:** Сохранение JWT в localStorage, защита страниц.
 - [ ] **Upload:** Реальная загрузка файлов на сервер вместо заглушек.
@@ -45,4 +46,4 @@
 - [ ] **New Roadmap:** Планирование версии v2.0 (RPG Integration, S3, etc.).
 
 ---
-[🏠 Вернуться на главную](../../index.md)
+[🏠 Вернуться на главную](../index.md)

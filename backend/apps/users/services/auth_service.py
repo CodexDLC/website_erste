@@ -45,6 +45,7 @@ class AuthService:
         user_with_hash = user_in.model_copy(update={"password": hashed_password})
 
         created_user = await self.user_repository.create(user_with_hash)
+        await self.user_repository.commit()
 
         logger.info(f"AuthService | action=register_success user_id={created_user.id}")
 
@@ -99,6 +100,7 @@ class AuthService:
         await self.token_repository.create(
             user_id=user.id, token=refresh_token, expires_at=refresh_token_expires
         )
+        await self.token_repository.commit()
 
         logger.debug(f"AuthService | action=tokens_generated user_id={user.id}")
 
@@ -119,6 +121,7 @@ class AuthService:
         if db_token.expires_at < now:
             logger.warning("AuthService | action=refresh_failed reason=token_expired")
             await self.token_repository.delete(token)
+            await self.token_repository.commit()
             raise AuthException("Refresh token expired")
 
         user = await self.user_repository.get_by_id(db_token.user_id)
@@ -127,6 +130,7 @@ class AuthService:
                 f"AuthService | action=refresh_failed reason=user_not_found user_id={db_token.user_id}"
             )
             await self.token_repository.delete(token)
+            await self.token_repository.commit()
             raise AuthException("User not found")
 
         if not user.is_active:
@@ -142,3 +146,4 @@ class AuthService:
         Logout: simply delete the refresh token.
         """
         await self.token_repository.delete(token)
+        await self.token_repository.commit()

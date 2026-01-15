@@ -60,7 +60,7 @@ root/
 ```
 
 ## 📑 Management & Planning
-*   **[📅 Management](./management/index.md)** (Roadmap, Tasks, Tech Debt)
+*   **[📅 Management](../management/index.md)** (Roadmap, Tasks, Tech Debt)
 *   **[🏗️ Architecture Details](./architecture/index.md)** (Deep dive into flows & domains)
 
 ---

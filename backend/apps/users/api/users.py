@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends
 from loguru import logger
 
 from backend.apps.users.schemas.user import UserResponse
-from backend.apps.users.dependencies import get_current_user
-from backend.database.models.models import User
+from backend.dependencies.auth import get_current_user
+from backend.database.models import User
 
 router = APIRouter()
 

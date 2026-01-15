@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
 
-from backend.database.models.models import RefreshToken
+from backend.database.models import RefreshToken
 
 
 class TokenRepository:
@@ -21,7 +21,7 @@ class TokenRepository:
     ) -> RefreshToken:
         db_token = RefreshToken(user_id=user_id, token=token, expires_at=expires_at)
         self.session.add(db_token)
-        await self.session.commit()
+        await self.session.flush()
         await self.session.refresh(db_token)
         return db_token
 
@@ -33,9 +33,10 @@ class TokenRepository:
     async def delete(self, token: str) -> None:
         stmt = delete(RefreshToken).where(RefreshToken.token == token)
         await self.session.execute(stmt)
-        await self.session.commit()
 
     async def delete_all_for_user(self, user_id: uuid.UUID) -> None:
         stmt = delete(RefreshToken).where(RefreshToken.user_id == user_id)
         await self.session.execute(stmt)
+
+    async def commit(self) -> None:
         await self.session.commit()

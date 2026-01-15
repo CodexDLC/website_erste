@@ -22,3 +22,4 @@ loguru
 python-multipart
 python-magic
 pillow
+aiofiles
