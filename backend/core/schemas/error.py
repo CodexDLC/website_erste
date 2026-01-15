@@ -1,14 +1,15 @@
 # backend/core/schemas/error.py
-from typing import Optional, Any, Dict
+from typing import Any
+
 from pydantic import BaseModel
 
 
 class ErrorDetails(BaseModel):
     code: str
     message: str
-    fields: Optional[list[str]] = None  # Для 422 ошибки (какие поля неверны)
+    fields: list[str] | None = None  # Для 422 ошибки (какие поля неверны)
     # Позволяем добавлять любые дополнительные поля (например, headers для 401)
-    extra: Optional[Dict[str, Any]] = None
+    extra: dict[str, Any] | None = None
 
 
 class ErrorResponse(BaseModel):

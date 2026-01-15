@@ -1,6 +1,6 @@
-from typing import Optional, Protocol
 import uuid
 from datetime import datetime
+from typing import Protocol
 
 from backend.database.models import RefreshToken
 
@@ -10,15 +10,13 @@ class ITokenRepository(Protocol):
     Interface for Refresh Token Repository.
     """
 
-    async def create(
-        self, user_id: uuid.UUID, token: str, expires_at: datetime
-    ) -> RefreshToken:
+    async def create(self, user_id: uuid.UUID, token: str, expires_at: datetime) -> RefreshToken:
         """
         Save a new refresh token.
         """
         ...
 
-    async def get_by_token(self, token: str) -> Optional[RefreshToken]:
+    async def get_by_token(self, token: str) -> RefreshToken | None:
         """
         Find a refresh token by its value.
         """

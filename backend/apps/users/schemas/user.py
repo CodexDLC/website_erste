@@ -1,6 +1,5 @@
-from datetime import datetime
-from typing import Optional
 import uuid
+from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -27,9 +26,9 @@ class UserUpdate(BaseModel):
     Schema for User update.
     """
 
-    email: Optional[EmailStr] = None
-    password: Optional[str] = None
-    is_active: Optional[bool] = None
+    email: EmailStr | None = None
+    password: str | None = None
+    is_active: bool | None = None
 
 
 class UserResponse(UserBase):

@@ -1,22 +1,18 @@
-from fastapi import APIRouter, Depends, status, Response
+from fastapi import APIRouter, Depends, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 from loguru import logger
 
-from backend.core.exceptions import AuthException
+from backend.apps.users.schemas.token import RefreshTokenRequest, Token
 from backend.apps.users.schemas.user import UserCreate, UserResponse
-from backend.apps.users.schemas.token import Token, RefreshTokenRequest
 from backend.apps.users.services.auth_service import AuthService
+from backend.core.exceptions import AuthException
 from backend.dependencies.auth import get_auth_service
 
 router = APIRouter()
 
 
-@router.post(
-    "/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED
-)
-async def register_new_user(
-    user_in: UserCreate, auth_service: AuthService = Depends(get_auth_service)
-):
+@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def register_new_user(user_in: UserCreate, auth_service: AuthService = Depends(get_auth_service)):
     """
     Register a new user.
     """
@@ -44,9 +40,7 @@ async def login_for_access_token(
 
 
 @router.post("/refresh", response_model=Token)
-async def refresh_token(
-    token_in: RefreshTokenRequest, auth_service: AuthService = Depends(get_auth_service)
-):
+async def refresh_token(token_in: RefreshTokenRequest, auth_service: AuthService = Depends(get_auth_service)):
     """
     Get new access/refresh tokens.
     """
@@ -55,9 +49,7 @@ async def refresh_token(
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
-async def logout(
-    token_in: RefreshTokenRequest, auth_service: AuthService = Depends(get_auth_service)
-):
+async def logout(token_in: RefreshTokenRequest, auth_service: AuthService = Depends(get_auth_service)):
     """
     Logout user.
     """

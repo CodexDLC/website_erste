@@ -1,9 +1,9 @@
 # backend/router.py
 from fastapi import APIRouter
 
+from backend.apps.media.api.media import router as media_router
 from backend.apps.users.api.auth import router as auth_router
 from backend.apps.users.api.users import router as users_router
-from backend.apps.media.api.media import router as media_router
 
 api_router = APIRouter()
 

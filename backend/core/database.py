@@ -1,17 +1,18 @@
 # backend/core/database.py
-from typing import AsyncGenerator, Any
+from collections.abc import AsyncGenerator
+from typing import Any
 from urllib.parse import urlparse, urlunparse
 
+from loguru import logger as log
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy.exc import SQLAlchemyError
-from loguru import logger as log
 
-from .config import settings
 from ..database.models.base import Base
+from .config import settings
 
 connect_args: dict[str, Any] = {
     "prepared_statement_cache_size": 0,

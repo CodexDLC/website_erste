@@ -3,10 +3,10 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.core.database import get_db
 from backend.apps.media.contracts.media_repository import IMediaRepository
-from backend.database.repositories.media_repository import MediaRepository
 from backend.apps.media.services.media_service import MediaService
+from backend.core.database import get_db
+from backend.database.repositories.media_repository import MediaRepository
 
 
 def get_media_repository(

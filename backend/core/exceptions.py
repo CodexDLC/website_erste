@@ -1,5 +1,5 @@
 # backend/core/exceptions.py
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import HTTPException, Request, status
 from fastapi.responses import JSONResponse
@@ -10,8 +10,8 @@ class BaseAPIException(HTTPException):
         self,
         status_code: int,
         detail: Any = None,
-        error_code: Optional[str] = None,
-        extra: Optional[dict] = None,
+        error_code: str | None = None,
+        extra: dict | None = None,
     ):
         super().__init__(status_code=status_code, detail=detail)
         self.error_code = error_code
@@ -20,13 +20,11 @@ class BaseAPIException(HTTPException):
 
 class NotFoundException(BaseAPIException):
     def __init__(self, detail: str = "Resource not found"):
-        super().__init__(
-            status_code=status.HTTP_404_NOT_FOUND, detail=detail, error_code="not_found"
-        )
+        super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail=detail, error_code="not_found")
 
 
 class ValidationException(BaseAPIException):
-    def __init__(self, detail: str, errors: Optional[list] = None):
+    def __init__(self, detail: str, errors: list | None = None):
         super().__init__(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=detail,

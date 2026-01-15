@@ -1,5 +1,5 @@
-from typing import Optional, Protocol
 import uuid
+from typing import Protocol
 
 from backend.apps.users.schemas.user import UserCreate
 from backend.database.models import User
@@ -11,7 +11,7 @@ class IUserRepository(Protocol):
     Defines the contract for data access operations related to Users.
     """
 
-    async def get_by_id(self, user_id: uuid.UUID) -> Optional[User]:
+    async def get_by_id(self, user_id: uuid.UUID) -> User | None:
         """
         Retrieve a user by their unique ID.
 
@@ -23,7 +23,7 @@ class IUserRepository(Protocol):
         """
         ...
 
-    async def get_by_email(self, email: str) -> Optional[User]:
+    async def get_by_email(self, email: str) -> User | None:
         """
         Retrieve a user by their email address.
 
