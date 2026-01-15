@@ -18,16 +18,15 @@
 *   **FastAPI** — Высокопроизводительный API.
 *   **SQLAlchemy (Async)** — Работа с базой данных PostgreSQL.
 *   **Clean Architecture** — Модульная и расширяемая структура кода.
-*   **Loguru** — Профессиональное логирование.
 
 ### Frontend (Vanilla)
 *   **HTML5 / CSS3** — Адаптивная верстка.
 *   **JavaScript (ES6+)** — SPA-подобная логика без тяжелых фреймворков.
 
 ### Infrastructure
+*   **Docker Compose** — Полная контейнеризация окружения.
 *   **Nginx** — Reverse Proxy и раздача статики.
 *   **PostgreSQL** — Надежное хранение данных.
-*   **Docker** — Контейнеризация (в планах).
 
 ## 📂 Структура Репозитория
 
@@ -36,30 +35,28 @@
 *   **[`backend/`](./backend/)** — Серверная часть (API, DB, Logic).
 *   **[`frontend/`](./frontend/)** — Клиентская часть (UI/UX).
 *   **[`docs/`](./docs/)** — **Полная документация проекта.**
-    *   [🏗️ Архитектура Бэкенда](./docs/backend/index.md)
-    *   [🗺️ Roadmap](docs/management/roadmap.md)
+    *   [🏗️ Backend Architecture](./docs/backend/index.md)
+    *   [🎨 Frontend Documentation](./docs/frontend/index.md)
+    *   [🏗️ Infrastructure & DevOps](./docs/infrastructure/index.md)
+    *   [📅 Management & Roadmap](./docs/management/index.md)
 
 ## 🚀 Быстрый Старт
 
-### 1. Предварительные требования
-*   Python 3.11+
-*   PostgreSQL (или Docker)
+Подробная инструкция: **[🏃 Runbook: Запуск и Остановка](./docs/infrastructure/runbook.md)**
 
-### 2. Установка (Backend)
+### Вариант 1: Docker (Рекомендуемый)
+```bash
+docker-compose up -d --build
+```
+Сервис будет доступен по адресу: `http://localhost:8000`
+
+### Вариант 2: Локально (Python)
 ```bash
 cd backend
 python -m venv .venv
-source .venv/bin/activate  # или .venv\Scripts\activate на Windows
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-```
-
-### 3. Настройка
-Создайте файл `.env` в корне проекта (см. `.env.example`).
-
-### 4. Запуск
-```bash
-# Из корня проекта
-uvicorn backend.main:app --reload
+uvicorn main:app --reload
 ```
 
 ---
