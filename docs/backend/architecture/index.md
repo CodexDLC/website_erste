@@ -12,9 +12,9 @@
 *   **[Core](./core/index.md)** — Инфраструктурные компоненты (Config, DB, Logger).
 
 ## 📅 Planning
-*   **[Roadmap](../management/roadmap.md)** — Глобальный план развития.
-*   **[Tasks](../management/tasks/index.md)** — Текущие задачи.
-*   **[Tech Debt](../management/tech_debt.md)** — Технический долг.
+*   **[Roadmap](../../management/roadmap.md)** — Глобальный план развития.
+*   **[Tasks](../../management/tasks/index.md)** — Текущие задачи.
+*   **[Tech Debt](../../management/tech_debt.md)** — Технический долг.
 
 ---
 [🏠 Вернуться на главную](../../index.md)

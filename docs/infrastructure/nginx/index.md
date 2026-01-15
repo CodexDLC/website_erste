@@ -1,4 +1,4 @@
-[🏠 Home](../index.md)
+[🏠 Home](../../index.md)
 
 # 🌐 Nginx Gateway Documentation
 
@@ -6,17 +6,17 @@
 
 ## 📚 Разделы
 
-### 🏗️ [Architecture](./architecture.md)
+### 🏗️ [Architecture](architecture.md)
 Роль Nginx в системе и схема потоков данных.
 
-### 🗺️ [Routing Map](./routing.md)
+### 🗺️ [Routing Map](routing.md)
 Таблица маршрутизации: какой URL куда ведет (API vs Static).
 
-### ⚙️ [Configuration Spec](./config_spec.md)
+### ⚙️ [Configuration Spec](config_spec.md)
 Детальный разбор `nginx.conf`: настройки кеширования, проксирования заголовков и раздачи статики.
 
-### 🐳 [Docker Setup](./docker_setup.md)
+### 🐳 [Docker Setup](docker_setup.md)
 Интеграция с Docker Compose и настройка Volumes.
 
 ---
-[🏠 Вернуться на главную](../index.md)
+[🏠 Вернуться на главную](../../index.md)
