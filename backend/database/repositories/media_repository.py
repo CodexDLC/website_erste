@@ -26,7 +26,9 @@ class MediaRepository:
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def create_file(self, hash: str, size_bytes: int, mime_type: str, path: str) -> File:
+    async def create_file(
+        self, hash: str, size_bytes: int, mime_type: str, path: str
+    ) -> File:
         """
         Register a new physical file in the database.
         Initial ref_count is 0 (will be incremented when Image is created).
@@ -36,7 +38,7 @@ class MediaRepository:
             size_bytes=size_bytes,
             mime_type=mime_type,
             path=path,
-            ref_count=0 
+            ref_count=0,
         )
         self.session.add(file)
         await self.session.flush()
@@ -65,13 +67,9 @@ class MediaRepository:
         Increments the file's ref_count.
         """
         # 1. Create Image record
-        image = Image(
-            user_id=user_id,
-            file_hash=file_hash,
-            filename=filename
-        )
+        image = Image(user_id=user_id, file_hash=file_hash, filename=filename)
         self.session.add(image)
-        
+
         # 2. Increment File ref_count
         stmt = (
             update(File)
@@ -79,13 +77,15 @@ class MediaRepository:
             .values(ref_count=File.ref_count + 1)
         )
         await self.session.execute(stmt)
-        
+
         await self.session.flush()
         await self.session.refresh(image)
-        
+
         # Explicitly load the file relationship to avoid lazy loading issues later
         # This is a bit of a hack, usually we return what we created, but for consistency:
-        stmt_load = select(Image).where(Image.id == image.id).options(selectinload(Image.file))
+        stmt_load = (
+            select(Image).where(Image.id == image.id).options(selectinload(Image.file))
+        )
         result = await self.session.execute(stmt_load)
         return result.scalar_one()
 
@@ -96,7 +96,7 @@ class MediaRepository:
         stmt = (
             select(Image)
             .where(Image.id == image_id)
-            .options(selectinload(Image.file)) # Eager load File
+            .options(selectinload(Image.file))  # Eager load File
         )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
@@ -110,12 +110,14 @@ class MediaRepository:
             .order_by(Image.created_at.desc())
             .limit(limit)
             .offset(offset)
-            .options(selectinload(Image.file)) # Eager load File
+            .options(selectinload(Image.file))  # Eager load File
         )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
-    
-    async def get_images_by_user(self, user_id: UUID, limit: int, offset: int) -> List[Image]:
+
+    async def get_images_by_user(
+        self, user_id: UUID, limit: int, offset: int
+    ) -> List[Image]:
         """
         Get gallery for a specific user.
         """
@@ -125,7 +127,7 @@ class MediaRepository:
             .order_by(Image.created_at.desc())
             .limit(limit)
             .offset(offset)
-            .options(selectinload(Image.file)) # Eager load File
+            .options(selectinload(Image.file))  # Eager load File
         )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
@@ -139,7 +141,7 @@ class MediaRepository:
         stmt_get = select(Image.file_hash).where(Image.id == image_id)
         result = await self.session.execute(stmt_get)
         file_hash = result.scalar_one_or_none()
-        
+
         if file_hash:
             # 2. Decrement File ref_count
             stmt_update = (

@@ -46,7 +46,9 @@ async def get_my_gallery(
     """
     Get current user's gallery.
     """
-    return await service.get_user_gallery(user_id=current_user.id, limit=limit, offset=offset)
+    return await service.get_user_gallery(
+        user_id=current_user.id, limit=limit, offset=offset
+    )
 
 
 @router.delete("/{image_id}", status_code=status.HTTP_204_NO_CONTENT)

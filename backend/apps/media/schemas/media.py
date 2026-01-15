@@ -8,6 +8,7 @@ class FileRead(BaseModel):
     """
     Schema for reading File metadata (CAS).
     """
+
     hash: str
     size_bytes: int
     mime_type: str
@@ -20,6 +21,7 @@ class ImageRead(BaseModel):
     """
     Schema for reading Image metadata (User Asset).
     """
+
     id: UUID
     filename: str
     created_at: datetime
