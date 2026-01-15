@@ -37,7 +37,7 @@
 *   **[`frontend/`](./frontend/)** — Клиентская часть (UI/UX).
 *   **[`docs/`](./docs/)** — **Полная документация проекта.**
     *   [🏗️ Архитектура Бэкенда](./docs/backend/index.md)
-    *   [🗺️ Roadmap](./docs/backend/management/roadmap.md)
+    *   [🗺️ Roadmap](docs/management/roadmap.md)
 
 ## 🚀 Быстрый Старт
 

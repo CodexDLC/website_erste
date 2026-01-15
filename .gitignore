@@ -63,5 +63,4 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 
-# === System Instructions ===
-SYSTEM_INSTRUCTION.md
+
