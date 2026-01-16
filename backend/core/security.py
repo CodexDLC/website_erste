@@ -21,7 +21,7 @@ def create_access_token(subject: str | Any, expires_delta: timedelta | None = No
     # jwt.encode returns str in newer versions or Any.
     # Mypy complains about redundant cast if it sees it as str.
     # We remove cast and let it be inferred, or force str() if needed.
-    return str(jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM))
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
