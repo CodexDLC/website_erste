@@ -48,18 +48,20 @@ jobs:
           script: |
             cd /opt/pinlite
             
-            # Создаем .env
-            echo "${{ secrets.ENV_FILE }}" > .env
+            # 1. Безопасная запись .env (не боится спецсимволов)
+            cat << 'EOF' > .env
+            ${{ secrets.ENV_FILE }}
+            EOF
             
-            # Логинимся
-            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            # 2. Логин с кавычками для защиты токена
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
-            # Используем переданную переменную REPO_LOWER
+            # 3. Переменные и запуск
+            # Используем переменную REPO_LOWER, переданную через envs
             export DOCKER_IMAGE_BACKEND=ghcr.io/$REPO_LOWER:latest
             
-            # Деплоим
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d --remove-orphans --wait
             
-            # Чистим
+            # Очистка старых образов
             docker image prune -f
