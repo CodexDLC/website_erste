@@ -12,7 +12,9 @@ router = APIRouter()
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def register_new_user(user_in: UserCreate, auth_service: AuthService = Depends(get_auth_service)):
+async def register_new_user(
+    user_in: UserCreate, auth_service: AuthService = Depends(get_auth_service)
+) -> UserResponse:
     """
     Register a new user.
     """
@@ -24,7 +26,7 @@ async def register_new_user(user_in: UserCreate, auth_service: AuthService = Dep
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     auth_service: AuthService = Depends(get_auth_service),
-):
+) -> Token:
     """
     OAuth2 compatible token login.
     """
@@ -40,7 +42,9 @@ async def login_for_access_token(
 
 
 @router.post("/refresh", response_model=Token)
-async def refresh_token(token_in: RefreshTokenRequest, auth_service: AuthService = Depends(get_auth_service)):
+async def refresh_token(
+    token_in: RefreshTokenRequest, auth_service: AuthService = Depends(get_auth_service)
+) -> Token:
     """
     Get new access/refresh tokens.
     """
@@ -49,7 +53,9 @@ async def refresh_token(token_in: RefreshTokenRequest, auth_service: AuthService
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
-async def logout(token_in: RefreshTokenRequest, auth_service: AuthService = Depends(get_auth_service)):
+async def logout(
+    token_in: RefreshTokenRequest, auth_service: AuthService = Depends(get_auth_service)
+) -> Response:
     """
     Logout user.
     """

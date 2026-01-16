@@ -3,11 +3,13 @@
 # Linting & Formatting
 ruff
 mypy
+types-aiofiles # Stubs for aiofiles
 
 # Testing
 pytest
 pytest-asyncio
 httpx  # For testing API
+greenlet # Required for SQLAlchemy async
 
 # Debugging
 ipdb

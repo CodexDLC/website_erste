@@ -19,7 +19,7 @@ async def upload_file(
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_user),
     service: MediaService = Depends(get_media_service),
-):
+) -> ImageRead:
     """
     Upload a new image.
     """
@@ -31,7 +31,7 @@ async def get_feed(
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
     service: MediaService = Depends(get_media_service),
-):
+) -> list[ImageRead]:
     """
     Get public feed of images.
     """
@@ -44,7 +44,7 @@ async def get_my_gallery(
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
     service: MediaService = Depends(get_media_service),
-):
+) -> list[ImageRead]:
     """
     Get current user's gallery.
     """
@@ -56,7 +56,7 @@ async def delete_image(
     image_id: UUID = PathParam(...),
     current_user: User = Depends(get_current_user),
     service: MediaService = Depends(get_media_service),
-):
+) -> None:
     """
     Delete an image.
     """
@@ -70,7 +70,7 @@ async def delete_image(
 async def get_file(
     file_hash: str = PathParam(..., min_length=64, max_length=64),
     service: MediaService = Depends(get_media_service),
-):
+) -> FileResponse:
     """
     Serve original file by hash.
     """
@@ -87,7 +87,7 @@ async def get_file(
 async def get_thumbnail(
     file_hash: str = PathParam(..., min_length=64, max_length=64),
     service: MediaService = Depends(get_media_service),
-):
+) -> FileResponse:
     """
     Serve thumbnail by hash.
     """

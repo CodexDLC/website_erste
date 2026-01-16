@@ -32,6 +32,7 @@ dev = [
     "pytest>=7.4.0",
     "pytest-asyncio>=0.21.0",
     "httpx>=0.25.0",
+    "types-aiofiles>=23.2.0",
 ]
 
 [tool.ruff]
@@ -46,5 +47,32 @@ ignore = ["B008"]
 
 [tool.mypy]
 python_version = "3.11"
+files = ["backend", "tests"]
+plugins = ["pydantic.mypy"]
 strict = true
 ignore_missing_imports = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+no_implicit_optional = true
+
+# Ослабляем правила для тестов (разрешаем неполные типы, но требуем return type)
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+[tool.pytest.ini_options]
+pythonpath = "."
+asyncio_mode = "auto"
+testpaths = ["tests"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]

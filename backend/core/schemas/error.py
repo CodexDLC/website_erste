@@ -1,21 +1,21 @@
 # backend/core/schemas/error.py
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ErrorDetails(BaseModel):
-    code: str
-    message: str
-    fields: list[str] | None = None  # Для 422 ошибки (какие поля неверны)
-    # Позволяем добавлять любые дополнительные поля (например, headers для 401)
-    extra: dict[str, Any] | None = None
+    code: str = Field(..., description="Internal error code (e.g. 'user_not_found')")
+    message: str = Field(..., description="Human-readable error message")
+    fields: list[Any] | None = Field(None, description="List of validation errors (for 422)")
+    
+    # Allow extra fields
+    model_config = {"extra": "allow"}
 
 
 class ErrorResponse(BaseModel):
     """
-    Стандартизированный ответ с ошибкой.
-    Используется для документации Swagger (400, 401, 404, 500).
+    Standardized error response structure.
+    Used for Swagger documentation (400, 401, 403, 404, 500).
     """
-
     error: ErrorDetails

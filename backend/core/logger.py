@@ -44,8 +44,9 @@ def setup_loguru() -> None:
     )
 
     # File (Debug)
+    # Cast Path to str to satisfy mypy overload resolution
     logger.add(
-        sink=settings.log_file_debug,
+        sink=str(settings.log_file_debug),
         level=settings.LOG_LEVEL_FILE.upper(),
         rotation=settings.LOG_ROTATION,
         compression="zip",
@@ -54,7 +55,7 @@ def setup_loguru() -> None:
 
     # File (Errors JSON)
     logger.add(
-        sink=settings.log_file_errors,
+        sink=str(settings.log_file_errors),
         level="ERROR",
         serialize=True,
         rotation=settings.LOG_ROTATION,

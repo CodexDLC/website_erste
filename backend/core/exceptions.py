@@ -11,7 +11,7 @@ class BaseAPIException(HTTPException):
         status_code: int,
         detail: Any = None,
         error_code: str | None = None,
-        extra: dict | None = None,
+        extra: dict[str, Any] | None = None,
     ):
         super().__init__(status_code=status_code, detail=detail)
         self.error_code = error_code
@@ -24,7 +24,7 @@ class NotFoundException(BaseAPIException):
 
 
 class ValidationException(BaseAPIException):
-    def __init__(self, detail: str, errors: list | None = None):
+    def __init__(self, detail: str, errors: list[Any] | None = None):
         super().__init__(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=detail,
@@ -61,7 +61,7 @@ class AuthException(BaseAPIException):
         )
 
 
-async def api_exception_handler(request: Request, exc: BaseAPIException):
+async def api_exception_handler(request: Request, exc: BaseAPIException) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,
         content={"error": {"code": exc.error_code, "message": exc.detail, **exc.extra}},

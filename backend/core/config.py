@@ -1,17 +1,13 @@
 # backend/core/config.py
 import json
 from pathlib import Path
+from typing import Any
 
 from pydantic import computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Определяем корень проекта
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
-# --- DEBUG PRINT ---
-print(f"DEBUG: Config is looking for .env at: {BASE_DIR / '.env'}")
-print(f"DEBUG: Does it exist? {(BASE_DIR / '.env').exists()}")
-# -------------------
 
 
 class Settings(BaseSettings):
@@ -57,7 +53,7 @@ class Settings(BaseSettings):
 
     @field_validator("ALLOWED_ORIGINS", mode="before")
     @classmethod
-    def parse_origins(cls, v):
+    def parse_origins(cls, v: Any) -> Any:
         if isinstance(v, str):
             try:
                 return json.loads(v)

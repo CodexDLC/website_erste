@@ -221,7 +221,7 @@ class MediaService:
         Returns detected mime-type if allowed, raises ValidationException otherwise.
         """
 
-        def _get_mime():
+        def _get_mime() -> str:
             # magic.from_file читает заголовок файла
             return magic.from_file(str(path), mime=True)
 
@@ -255,18 +255,18 @@ class MediaService:
         original_path = self._get_storage_path(file_hash)
         return original_path.parent / f"{file_hash}_thumb.jpg"
 
-    async def _generate_thumbnail(self, original_path: Path, file_hash: str):
+    async def _generate_thumbnail(self, original_path: Path, file_hash: str) -> None:
         """
         Generates a thumbnail for the image using Pillow.
         Runs in a threadpool to avoid blocking the event loop.
         """
         thumb_path = self._get_thumbnail_path(file_hash)
 
-        def _process():
+        def _process() -> None:
             with PILImage.open(original_path) as img:
                 # Convert to RGB if necessary (e.g. for PNGs with transparency)
                 if img.mode in ("RGBA", "P"):
-                    img = img.convert("RGB")
+                    img = img.convert("RGB") # type: ignore
 
                 # Resize keeping aspect ratio (max 300px on large side)
                 img.thumbnail((300, 300))
@@ -278,7 +278,7 @@ class MediaService:
         logger.debug(f"Thumbnail generated for {file_hash}")
 
     @staticmethod
-    async def _remove_file(path: Path):
+    async def _remove_file(path: Path) -> None:
         """
         Async wrapper for removing file using aiofiles.os
         """
