@@ -8,6 +8,12 @@ jobs:
   deploy:
     name: Build & Deploy to VPS
     runs-on: ubuntu-latest
+
+    # Даем права на запись в реестр пакетов (GHCR)
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       - uses: actions/checkout@v4
 
