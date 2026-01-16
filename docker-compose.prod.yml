@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  backend:
+    # В продакшене мы используем готовый образ из реестра GitHub
+    # ЗАМЕНИ: ghcr.io/твое_имя_пользователя/website_erste:latest
+    image: ${DOCKER_IMAGE_BACKEND}
+    container_name: pinlite-backend
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DATABASE_URL=${DATABASE_URL}
+      - DEBUG=False
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+      - LOG_LEVEL_CONSOLE=WARNING
+      - LOG_LEVEL_FILE=INFO
+    volumes:
+      # Код НЕ пробрасываем, он внутри контейнера.
+      # Пробрасываем только данные (картинки и логи)
+      - uploads:/app/data/uploads
+      - logs:/app/data/logs
+    expose:
+      - "8000"
+    restart: always
+    networks:
+      - pinlite-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: pinlite-nginx
+    ports:
+      - "80:80"
+      - "443:443" # Открываем HTTPS
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      # Сертификаты SSL (получим через certbot на сервере)
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+      # Статика фронтенда (она тоже должна быть в образе или копироваться, 
+      # но для простоты пока оставим volume, который CI скопирует)
+      - ./frontend:/usr/share/nginx/html:ro
+      - uploads:/app/media:ro
+    depends_on:
+      backend:
+        condition: service_started
+    restart: always
+    networks:
+      - pinlite-network
+
+volumes:
+  uploads:
+    driver: local
+  logs:
+    driver: local
+
+networks:
+  pinlite-network:
+    driver: bridge
