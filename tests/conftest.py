@@ -1,4 +1,5 @@
 import asyncio
+import os
 from typing import AsyncGenerator, Generator
 
 import pytest
@@ -11,8 +12,10 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.pool import NullPool
 
 # --- TEST DATABASE CONFIG ---
-# Используем локальный Docker контейнер на порту 5433
-TEST_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5433/test_db"
+# Читаем из ENV (для CI), иначе используем дефолт (для локального запуска)
+# В CI мы передаем DATABASE_URL=postgresql+asyncpg://postgres:test_password@localhost:5432/test_db
+DEFAULT_TEST_DB_URL = "postgresql+asyncpg://postgres:postgres@localhost:5433/test_db"
+TEST_DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_TEST_DB_URL)
 
 # Создаем отдельный engine для тестов
 test_engine = create_async_engine(
