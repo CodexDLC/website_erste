@@ -227,8 +227,7 @@ class MediaService:
             return str(magic.from_file(str(path), mime=True))
 
         # Выполняем в threadpool, так как magic - синхронная библиотека и читает диск
-        # Явно указываем тип переменной : str, чтобы Mypy не сомневался после run_in_threadpool
-        detected_mime: str = await run_in_threadpool(_get_mime)
+        detected_mime = await run_in_threadpool(_get_mime)
 
         if detected_mime not in self.ALLOWED_MIME_TYPES:
             raise ValidationException(

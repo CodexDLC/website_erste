@@ -11,6 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 1. Приводим имя репозитория к нижнему регистру (CodexDLC -> codexdlc)
+      - name: Lowercase repo name
+        run: |
+          echo "REPO_LOWER=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
@@ -23,7 +28,8 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}:latest
+          # Используем переменную в нижнем регистре
+          tags: ghcr.io/${{ env.REPO_LOWER }}:latest
 
       - name: SSH Deploy
         uses: appleboy/ssh-action@master
@@ -31,11 +37,23 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
+          # Передаем имя образа как переменную окружения внутрь SSH сессии
+          envs: REPO_LOWER
           script: |
             cd /opt/pinlite
+            
+            # Создаем .env
             echo "${{ secrets.ENV_FILE }}" > .env
+            
+            # Логинимся
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            export DOCKER_IMAGE_BACKEND=ghcr.io/${{ github.repository }}:latest
+            
+            # Используем переданную переменную REPO_LOWER
+            export DOCKER_IMAGE_BACKEND=ghcr.io/$REPO_LOWER:latest
+            
+            # Деплоим
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d --remove-orphans --wait
+            
+            # Чистим
             docker image prune -f
