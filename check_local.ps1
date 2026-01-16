@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop"
-Write-Host "🚀 Starting Local Quality Check (Backend Only)..." -ForegroundColor Cyan
+Write-Host "🚀 Starting Local Quality Check..." -ForegroundColor Cyan
 
 # 1. Backend: Ruff
 Write-Host "`n🔍 Checking Backend Style (Ruff)..." -ForegroundColor Yellow
@@ -23,4 +23,20 @@ try {
     exit 1
 }
 
-Write-Host "`n🎉 BACKEND CHECKS PASSED! You are ready to push." -ForegroundColor Cyan
+# 3. Backend: Pytest (Unit Tests Only)
+# Запускаем только unit-тесты, так как для integration нужна живая БД.
+# Если хочешь запускать всё, убедись, что БД поднята, и убери "tests/unit"
+Write-Host "`n🧪 Running Unit Tests (Pytest)..." -ForegroundColor Yellow
+try {
+    # Устанавливаем фейковый ключ, если его нет в .env, чтобы тесты не падали при старте
+    $env:SECRET_KEY = "local_test_key"
+
+    pytest tests/unit
+    if ($LASTEXITCODE -ne 0) { throw "Tests failed" }
+    Write-Host "✅ Tests passed!" -ForegroundColor Green
+} catch {
+    Write-Host "❌ Tests failed!" -ForegroundColor Red
+    exit 1
+}
+
+Write-Host "`n🎉 ALL CHECKS PASSED! You are ready to push." -ForegroundColor Cyan

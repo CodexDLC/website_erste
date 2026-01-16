@@ -35,6 +35,8 @@ jobs:
       - name: Run Pytest
         env:
           DATABASE_URL: postgresql+asyncpg://postgres:test_password@localhost:5432/test_db
+          # Добавляем фейковый ключ для тестов
+          SECRET_KEY: "test_secret_key_for_ci_pipeline_only"
         run: pytest
 
   build-check:

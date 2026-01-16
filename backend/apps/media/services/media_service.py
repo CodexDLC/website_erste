@@ -223,10 +223,12 @@ class MediaService:
 
         def _get_mime() -> str:
             # magic.from_file читает заголовок файла
-            return magic.from_file(str(path), mime=True)
+            # magic.from_file возвращает Any, поэтому принудительно приводим к str
+            return str(magic.from_file(str(path), mime=True))
 
         # Выполняем в threadpool, так как magic - синхронная библиотека и читает диск
-        detected_mime = await run_in_threadpool(_get_mime)
+        # Явно указываем тип переменной : str, чтобы Mypy не сомневался после run_in_threadpool
+        detected_mime: str = await run_in_threadpool(_get_mime)
 
         if detected_mime not in self.ALLOWED_MIME_TYPES:
             raise ValidationException(

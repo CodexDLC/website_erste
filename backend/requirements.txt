@@ -20,6 +20,11 @@ loguru
 
 # Utilities
 python-multipart
-python-magic
 pillow
 aiofiles
+
+# Magic (File type detection)
+# python-magic-bin нужен ТОЛЬКО для Windows.
+# python-magic нужен для Linux/Mac.
+python-magic-bin; sys_platform == 'win32'
+python-magic; sys_platform != 'win32'
