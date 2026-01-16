@@ -1,15 +1,19 @@
 -r backend/requirements.txt
 
 # Linting & Formatting
-ruff
-mypy
-types-aiofiles # Stubs for aiofiles
+ruff==0.1.13
+mypy==1.8.0
+types-aiofiles==23.2.0.0
+
+# Missing types (Adding them to sync with CI)
+types-passlib==1.7.7.20240106
+types-python-jose==3.3.4.20240106
 
 # Testing
-pytest
-pytest-asyncio
-httpx  # For testing API
-greenlet # Required for SQLAlchemy async
+pytest==7.4.4
+pytest-asyncio==0.23.3
+httpx==0.26.0
+greenlet==3.0.3
 
 # Debugging
-ipdb
+ipdb==0.13.13

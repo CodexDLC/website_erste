@@ -10,6 +10,7 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - DATABASE_URL=${DATABASE_URL}
       - DEBUG=False
+      # Разрешаем доступ с IP сервера
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
       - LOG_LEVEL_CONSOLE=WARNING
       - LOG_LEVEL_FILE=INFO
@@ -29,14 +30,12 @@ services:
     container_name: pinlite-nginx
     ports:
       - "80:80"
-      - "443:443" # Открываем HTTPS
+      # - "443:443" # Отключено для работы по IP (без SSL)
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      # Сертификаты SSL (получим через certbot на сервере)
-      - ./certbot/conf:/etc/letsencrypt:ro
-      - ./certbot/www:/var/www/certbot:ro
-      # Статика фронтенда (она тоже должна быть в образе или копироваться, 
-      # но для простоты пока оставим volume, который CI скопирует)
+      # Сертификаты SSL отключены
+      # - ./certbot/conf:/etc/letsencrypt:ro
+      # - ./certbot/www:/var/www/certbot:ro
       - ./frontend:/usr/share/nginx/html:ro
       - uploads:/app/media:ro
     depends_on:

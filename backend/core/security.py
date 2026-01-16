@@ -1,6 +1,6 @@
 # backend/core/security.py
 from datetime import UTC, datetime, timedelta
-from typing import Any, cast
+from typing import Any
 
 from jose import jwt
 from passlib.context import CryptContext
@@ -18,16 +18,17 @@ def create_access_token(subject: str | Any, expires_delta: timedelta | None = No
         expire = datetime.now(UTC) + timedelta(minutes=30)
 
     to_encode = {"exp": expire, "sub": str(subject)}
-    # jwt.encode returns Any (untyped library), so we cast or assume it's str
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
-    return cast(str, encoded_jwt)
+    # jwt.encode returns str in newer versions or Any.
+    # Mypy complains about redundant cast if it sees it as str.
+    # We remove cast and let it be inferred, or force str() if needed.
+    return str(jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM))
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    # pwd_context.verify returns Any/bool
-    return cast(bool, pwd_context.verify(plain_password, hashed_password))
+    # pwd_context.verify returns bool.
+    return pwd_context.verify(plain_password, hashed_password)
 
 
 def get_password_hash(password: str) -> str:
-    # pwd_context.hash returns Any/str
-    return cast(str, pwd_context.hash(password))
+    # pwd_context.hash returns str.
+    return pwd_context.hash(password)
