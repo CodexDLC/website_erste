@@ -16,27 +16,18 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+      # Node.js и Prettier убрали, так как мы бэкендеры :)
 
       - name: Install dependencies
         run: |
           # Устанавливаем ВСЕ зависимости (включая dev) из файла с зафиксированными версиями
           pip install -r requirements-dev.txt
           
-          # Доустанавливаем типы, если их нет в requirements-dev.txt (лучше добавить их туда!)
-          # Но пока оставим для надежности, если ты забудешь обновить файл
+          # Доустанавливаем типы на всякий случай
           pip install types-passlib types-python-jose
-
-          npm install -g prettier
 
       - name: Run Ruff (Backend Style)
         run: ruff check backend/
 
       - name: Run Mypy (Backend Types)
         run: mypy backend/
-
-      - name: Run Prettier (Frontend Style)
-        run: prettier --check "frontend/**/*.{js,css,html}"
