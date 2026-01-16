@@ -1,5 +1,5 @@
 import uuid
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -58,9 +58,13 @@ async def get_current_user(
     """
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
-        user_id_str: str = payload.get("sub")
-        if user_id_str is None:
+        # payload.get("sub") returns Any | None. We need to handle None explicitly.
+        user_id_raw: Any = payload.get("sub")
+        
+        if user_id_raw is None:
             raise AuthException(detail="Could not validate credentials")
+            
+        user_id_str = str(user_id_raw)
 
         # Validate that sub is a valid UUID
         try:
