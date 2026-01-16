@@ -23,10 +23,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # Устанавливаем зависимости проекта (чтобы mypy видел pydantic, sqlalchemy и т.д.)
-          pip install -r backend/requirements.txt
-          # Устанавливаем инструменты линтинга
-          pip install ruff mypy types-aiofiles types-passlib types-python-jose
+          # Устанавливаем ВСЕ зависимости (включая dev) из файла с зафиксированными версиями
+          pip install -r requirements-dev.txt
+          
+          # Доустанавливаем типы, если их нет в requirements-dev.txt (лучше добавить их туда!)
+          # Но пока оставим для надежности, если ты забудешь обновить файл
+          pip install types-passlib types-python-jose
+
           npm install -g prettier
 
       - name: Run Ruff (Backend Style)
