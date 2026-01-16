@@ -23,7 +23,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install ruff mypy
+          # Устанавливаем зависимости проекта (чтобы mypy видел pydantic, sqlalchemy и т.д.)
+          pip install -r backend/requirements.txt
+          # Устанавливаем инструменты линтинга
+          pip install ruff mypy types-aiofiles types-passlib types-python-jose
           npm install -g prettier
 
       - name: Run Ruff (Backend Style)
