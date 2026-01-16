@@ -35,6 +35,11 @@ dev = [
     "types-aiofiles>=23.2.0",
 ]
 
+# --- HATCH CONFIGURATION ---
+# Указываем, что наш пакет находится в папке backend
+[tool.hatch.build.targets.wheel]
+packages = ["backend"]
+
 [tool.ruff]
 line-length = 120
 target-version = "py311"
