@@ -2,9 +2,10 @@
 
 class ApiClient {
     constructor() {
-        // DEV MODE: Прямая ссылка на бэкенд (так как нет Nginx)
-        this.baseUrl = 'http://localhost:8000/api/v1';
-        // PROD MODE: this.baseUrl = '/api/v1';
+        // PROD MODE (Docker + Nginx):
+        // Все запросы идут через Nginx (порт 80), который проксирует /api/ на бэкенд.
+        // Поэтому baseUrl должен быть относительным или указывать на текущий хост.
+        this.baseUrl = '/api/v1';
 
         this.tokenKey = 'access_token';
     }
@@ -14,21 +15,9 @@ class ApiClient {
         if (!path) return '';
         if (path.startsWith('http')) return path;
 
-        // Если path уже содержит /api/v1, просто добавляем хост
-        // Но наш baseUrl уже содержит /api/v1.
-        // Бэкенд возвращает /api/v1/media/...
-
-        // Логика:
-        // baseUrl = http://localhost:8000/api/v1
-        // path = /api/v1/media/hash
-
-        // Нам нужно получить: http://localhost:8000/api/v1/media/hash
-
-        // 1. Получаем корень (http://localhost:8000)
-        const root = this.baseUrl.replace('/api/v1', '');
-
-        // 2. Склеиваем
-        return `${root}${path}`;
+        // Если path уже содержит /api/v1, просто возвращаем его как есть (относительный путь)
+        // Браузер сам подставит текущий домен (http://localhost)
+        return path;
     }
 
     // --- Приватный метод для выполнения запросов ---
@@ -54,7 +43,11 @@ class ApiClient {
         }
 
         try {
-            const response = await fetch(`${this.baseUrl}${endpoint}`, {
+            // ВАЖНО: Убираем порт 8000, если он вдруг где-то проскакивает
+            // Запрос должен идти на http://localhost/api/v1/... (порт 80)
+            const url = `${this.baseUrl}${endpoint}`;
+
+            const response = await fetch(url, {
                 method,
                 headers,
                 body: requestBody

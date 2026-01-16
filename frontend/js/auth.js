@@ -112,7 +112,9 @@ async function initProfileButton() {
 function showError(formId, message) {
     const errorBlock = document.getElementById(formId + '-error');
     if (errorBlock) {
-        errorBlock.textContent = message;
+        // Убираем "Registration failed: " если оно есть, чтобы не дублировать
+        const cleanMessage = message.replace("Registration failed: ", "").replace("Login failed: ", "");
+        errorBlock.textContent = cleanMessage;
         errorBlock.style.display = 'block';
     } else {
         alert(message);
@@ -170,7 +172,7 @@ function initAuthModalLogic() {
                 btn.textContent = "Logging in...";
                 await api.login(email, password);
             } catch (err) {
-                showError('login', "Login failed: " + err.message);
+                showError('login', err.message);
                 btn.disabled = false;
                 btn.textContent = "Login";
             }
@@ -212,7 +214,7 @@ function initAuthModalLogic() {
                 if (loginForm) loginForm.email.value = email;
 
             } catch (err) {
-                showError('register', "Registration failed: " + err.message);
+                showError('register', err.message);
                 btn.disabled = false;
                 btn.textContent = "Sign Up";
             }
