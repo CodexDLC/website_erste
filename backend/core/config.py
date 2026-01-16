@@ -5,11 +5,20 @@ from pathlib import Path
 from pydantic import computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Определяем корень проекта
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# --- DEBUG PRINT ---
+print(f"DEBUG: Config is looking for .env at: {BASE_DIR / '.env'}")
+print(f"DEBUG: Does it exist? {(BASE_DIR / '.env').exists()}")
+# -------------------
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore")
+    # Явно указываем полный путь к .env файлу
+    model_config = SettingsConfigDict(
+        env_file=BASE_DIR / ".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore"
+    )
 
     # === Main ===
     PROJECT_NAME: str = "PinLite"
@@ -43,7 +52,8 @@ class Settings(BaseSettings):
         return self.LOG_DIR / "errors.json"
 
     # === CORS ===
-    ALLOWED_ORIGINS: str | list[str] = '["http://localhost"]'
+    # DEV HACK: Разрешаем всем (перезаписывает значение из .env, если там другое)
+    ALLOWED_ORIGINS: str | list[str] = '["*"]'
 
     @field_validator("ALLOWED_ORIGINS", mode="before")
     @classmethod

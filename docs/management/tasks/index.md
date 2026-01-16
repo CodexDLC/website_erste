@@ -7,9 +7,11 @@
 ## 🏃 Active Sprint (Phase 4: Frontend Integration)
 Задачи, которые нужно выполнить в первую очередь для связки с фронтендом.
 
-*   [ ] **[Frontend API Integration](./frontend_api_integration.md)** — Перевод фронтенда с localStorage на реальный API (Login, Upload, Gallery).
-*   [ ] **Auth UI:** Верстка страниц Login/Register.
-*   [ ] **Error Handling:** Обработка ошибок API на фронтенде.
+*   [x] **[Frontend API Integration](./frontend_api_integration.md)** — Перевод фронтенда с localStorage на реальный API (Login, Upload, Gallery).
+
+## 💡 Future Ideas (v2.0)
+*   [ ] **[Social Mechanics (Likes)](./social_features.md)** — Лайки и популярное.
+*   [ ] **[Headless Mode (Microservice)](./headless_mode.md)** — Режим "Только API" (S3 replacement) по API Key.
 
 ## 📋 Backlog (Phase 5: Stabilization)
 Задачи по улучшению качества, тесты и CI/CD.

@@ -23,6 +23,10 @@
 }
 
 /* === СБРОС И БАЗА === */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   background-color: var(--page-bg);
   font-family: var(--font-main);
@@ -52,6 +56,11 @@ button {
 }
 
 /* === ШАПКА === */
+.header {
+  /* position: relative;  <-- УБРАЛИ, чтобы кнопка не зависела от хедера */
+  margin-bottom: 20px;
+}
+
 .header h1 {
   font-size: 2rem;
   margin-bottom: 10px;
@@ -65,6 +74,95 @@ button {
   color: var(--text-gray);
   margin-bottom: 30px;
   text-align: center;
+}
+
+/* Кнопка профиля (FIXED: Всегда справа сверху) */
+.profile-btn {
+  position: fixed; /* Было absolute */
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-gray);
+  transition: all 0.2s;
+  overflow: hidden;
+  font-weight: 700;
+  font-size: 1.2rem;
+  z-index: 1001; /* Поверх всего */
+}
+
+.profile-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.profile-btn.avatar-mode {
+  background-color: var(--accent);
+  color: white;
+  border: none;
+}
+
+/* === DROPDOWN MENU (FIXED) === */
+.profile-dropdown {
+  position: fixed; /* Было absolute */
+  top: 70px; /* 20px (отступ) + 40px (кнопка) + 10px (зазор) */
+  right: 20px;
+  width: 200px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-line);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: none;
+  z-index: 1000;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease;
+}
+
+.profile-dropdown.active {
+  display: block;
+}
+
+.dropdown-header {
+  padding: 15px;
+  border-bottom: 1px solid var(--border-line);
+  font-size: 0.9rem;
+  color: var(--text-gray);
+  word-break: break-all;
+}
+
+.dropdown-header strong {
+  display: block;
+  color: var(--text-white);
+  margin-bottom: 2px;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 12px 15px;
+  color: var(--text-white);
+  font-size: 0.95rem;
+  transition: background 0.2s;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dropdown-item:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--accent);
+}
+
+.dropdown-item.danger {
+  color: var(--danger);
+}
+.dropdown-item.danger:hover {
+  background: rgba(239, 68, 68, 0.1);
 }
 
 /* === КОНТЕЙНЕР ГЛАВНОЙ === */
