@@ -1,12 +1,13 @@
 // js/index.js
-// Управляет переключением: Маскот <-> Галерея <-> Просмотр
+// Управляет главной страницей: Загрузка ленты, Маскот, Просмотр, Защита ссылки Upload
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   // --- ЭЛЕМЕНТЫ DOM ---
   const mascotBlock = document.getElementById("mascot-placeholder");
   const gridContainer = document.getElementById("home-gallery-grid");
   const viewerBlock = document.getElementById("image-viewer");
   const imgMascot = document.querySelector(".animals img");
+  const showcaseBtn = document.querySelector(".showcase-btn"); // Кнопка перехода на Upload
 
   // Элементы внутри вьювера
   const viewerImg = document.getElementById("viewer-img");
@@ -14,13 +15,36 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnBack = document.getElementById("btn-back-gallery");
   const btnCopy = document.getElementById("btn-copy-url");
 
-  // --- ПРОВЕРКИ ---
-  if (typeof getGalleryData !== "function") {
-    console.error("Ошибка: storage.js не подключен!");
-    return;
+  // --- ЗАЩИТА ССЫЛКИ UPLOAD ---
+  if (showcaseBtn) {
+    showcaseBtn.addEventListener("click", (e) => {
+      if (!api.isLoggedIn()) {
+        e.preventDefault(); // Отменяем переход
+        // Открываем модалку входа (через auth.js логику или напрямую)
+        const modal = document.getElementById('login-modal');
+        if (modal) {
+            // Сбрасываем на логин
+            const viewLogin = document.getElementById('view-login');
+            const viewRegister = document.getElementById('view-register');
+            if (viewLogin) viewLogin.style.display = 'block';
+            if (viewRegister) viewRegister.style.display = 'none';
+
+            modal.showModal();
+        } else {
+            alert("Please login to upload.");
+        }
+      }
+    });
   }
 
-  const images = getGalleryData();
+  // --- ЗАГРУЗКА ДАННЫХ ---
+  let images = [];
+  try {
+    images = await api.get('/media/feed?limit=50&offset=0');
+  } catch (err) {
+    console.error("Failed to load feed:", err);
+  }
+
   const count = images.length;
 
   // --- ФУНКЦИЯ: ОТКРЫТЬ ПРОСМОТР ---
@@ -28,19 +52,20 @@ document.addEventListener("DOMContentLoaded", () => {
     // Скрываем сетку, показываем вьювер
     gridContainer.style.display = "none";
     viewerBlock.style.display = "block";
+    if (mascotBlock) mascotBlock.style.display = "none";
 
     // Заполняем данными
-    viewerImg.src = file.src;
-    viewerTitle.textContent = file.name;
+    // FIX: Используем api.getImageUrl для полного пути
+    const fullUrl = api.getImageUrl(file.url);
+    viewerImg.src = fullUrl;
+    viewerTitle.textContent = file.filename;
 
     // Логика кнопки Copy
-    // Удаляем старые слушатели (клонированием), чтобы не плодить их
     const newBtnCopy = btnCopy.cloneNode(true);
     btnCopy.parentNode.replaceChild(newBtnCopy, btnCopy);
 
     newBtnCopy.addEventListener("click", () => {
-      const fakeUrl = `https://sharefile.xyz/${file.name}`;
-      navigator.clipboard.writeText(fakeUrl).then(() => {
+      navigator.clipboard.writeText(fullUrl).then(() => {
         const oldText = newBtnCopy.textContent;
         newBtnCopy.textContent = "COPIED!";
         newBtnCopy.style.backgroundColor = "#10b981"; // Зеленый
@@ -51,22 +76,26 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Скролл наверх (для красоты)
+    // Скролл наверх
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   // --- ФУНКЦИЯ: ЗАКРЫТЬ ПРОСМОТР (НАЗАД) ---
   function closeViewer() {
     viewerBlock.style.display = "none";
-    gridContainer.style.display = "flex"; // Возвращаем сетку
+    // Если картинок нет, показываем маскота, иначе сетку
+    if (count > 0) {
+        gridContainer.style.display = "flex";
+    } else {
+        if (mascotBlock) mascotBlock.style.display = "flex";
+    }
   }
 
-  // Слушатель на кнопку "Back"
   if (btnBack) {
     btnBack.onclick = closeViewer;
   }
 
-  // === ЛОГИКА ЗАГРУЗКИ СТРАНИЦЫ ===
+  // === ЛОГИКА ОТОБРАЖЕНИЯ ===
 
   // 1. ЕСЛИ ПУСТО
   if (count === 0) {
@@ -91,8 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
     gridContainer.className = "smart-gallery";
     gridContainer.innerHTML = "";
 
-    const recentImages = images.slice().reverse();
-
     // --- УМНАЯ НАРЕЗКА (Chunking) ---
     let sliceSizes = [];
     if (count === 3) sliceSizes = [2, 1];
@@ -110,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentIndex = 0;
 
     sliceSizes.forEach((size) => {
-      const chunk = recentImages.slice(currentIndex, currentIndex + size);
+      const chunk = images.slice(currentIndex, currentIndex + size);
       currentIndex += size;
 
       const rowDiv = document.createElement("div");
@@ -119,14 +146,13 @@ document.addEventListener("DOMContentLoaded", () => {
       chunk.forEach((file) => {
         const card = document.createElement("div");
         card.className = "gallery-card";
-
-        // --- ВАЖНО: ТЕПЕРЬ МЫ НЕ ИДЕМ НА НОВУЮ СТРАНИЦУ ---
-        // Мы вызываем функцию внутри этого же скрипта
         card.onclick = () => openViewer(file);
 
         const img = document.createElement("img");
-        img.src = file.src;
-        img.alt = file.name;
+        // FIX: Используем api.getImageUrl для миниатюры
+        img.src = api.getImageUrl(file.src);
+        img.alt = file.filename;
+        img.loading = "lazy";
 
         card.appendChild(img);
         rowDiv.appendChild(card);

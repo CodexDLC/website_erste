@@ -38,7 +38,18 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-if settings.ALLOWED_ORIGINS:
+# --- CORS SETUP ---
+# Если DEBUG=True, разрешаем вообще всё (для локальной разработки)
+if settings.DEBUG:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origin_regex=".*",  # Разрешает любой Origin
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+# Иначе используем список из конфига
+elif settings.ALLOWED_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.ALLOWED_ORIGINS,

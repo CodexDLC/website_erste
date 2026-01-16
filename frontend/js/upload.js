@@ -1,116 +1,216 @@
 // js/upload.js
+// Управляет загрузкой файлов (Drag & Drop, API Upload) и показом последних загрузок
+
+// 1. STRICT AUTH CHECK
+if (!api.isLoggedIn()) {
+    window.location.href = "index.html?login=true";
+}
 
 document.addEventListener("DOMContentLoaded", () => {
-  const fileInput = document.getElementById("file-input-field");
+  if (!api.isLoggedIn()) return;
+
   const dropZone = document.getElementById("drop-zone");
-  const resultInput = document.getElementById("result-link");
+  const fileInput = document.getElementById("file-input-field");
+  const resultLinkInput = document.getElementById("result-link");
   const copyBtn = document.getElementById("copy-btn");
-  const galleryBtn = document.getElementById("gallery-tab-btn"); // Находим кнопку галереи
+  const gridContainer = document.getElementById("my-gallery-grid");
+  const dropText = document.querySelector(".drop-text");
 
-  // --- Функция: Проверяем, нужно ли показывать кнопку Images ---
-  function checkGalleryStatus() {
-    // Берем данные через функцию из storage.js
-    const galleryData = getGalleryData();
+  // VIEWER ELEMENTS
+  const viewerBlock = document.getElementById("image-viewer");
+  const viewerImg = document.getElementById("viewer-img");
+  const viewerTitle = document.getElementById("viewer-title");
+  const btnBack = document.getElementById("btn-back-gallery");
+  const btnCopyViewer = document.getElementById("btn-copy-url-viewer");
 
-    if (galleryData.length > 0) {
-      // Если картинки есть — показываем кнопку (display: block или inline-block)
-      if (galleryBtn) galleryBtn.style.display = "block";
-    } else {
-      // Если пусто — скрываем
-      if (galleryBtn) galleryBtn.style.display = "none";
+  // Инициализация: Загружаем галерею сразу
+  loadMyRecentGallery();
+
+  // --- VIEWER LOGIC ---
+  function openViewer(file) {
+    if (!viewerBlock) return;
+    viewerBlock.style.display = "block";
+    // Скрываем основной контент, чтобы не скроллился
+    document.querySelector('.upload-wrapper').style.display = 'none';
+
+    const fullUrl = api.getImageUrl(file.url);
+    viewerImg.src = fullUrl;
+    viewerTitle.textContent = file.filename;
+
+    // Copy Button in Viewer
+    const newBtnCopy = btnCopyViewer.cloneNode(true);
+    btnCopyViewer.parentNode.replaceChild(newBtnCopy, btnCopyViewer);
+    newBtnCopy.addEventListener("click", () => {
+      navigator.clipboard.writeText(fullUrl).then(() => {
+        const oldText = newBtnCopy.textContent;
+        newBtnCopy.textContent = "COPIED!";
+        newBtnCopy.style.backgroundColor = "#10b981";
+        setTimeout(() => {
+          newBtnCopy.textContent = oldText;
+          newBtnCopy.style.backgroundColor = "";
+        }, 2000);
+      });
+    });
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function closeViewer() {
+    if (!viewerBlock) return;
+    viewerBlock.style.display = "none";
+    document.querySelector('.upload-wrapper').style.display = 'flex';
+  }
+
+  if (btnBack) btnBack.onclick = closeViewer;
+
+
+  // --- DRAG & DROP VISUALS ---
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, preventDefaults, false);
+    document.body.addEventListener(eventName, preventDefaults, false);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-over'), false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-over'), false);
+  });
+
+  // --- ОБРАБОТКА ФАЙЛОВ ---
+  dropZone.addEventListener('drop', (e) => {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    handleFiles(files);
+  });
+
+  fileInput.addEventListener('change', function() {
+    handleFiles(this.files);
+  });
+
+  function handleFiles(files) {
+    if (files.length > 0) {
+      uploadFile(files[0]);
     }
   }
 
-  // 1. Запускаем проверку сразу при загрузке страницы
-  checkGalleryStatus();
-
-  // --- Обработка инпута ---
-  if (fileInput) {
-    fileInput.addEventListener("change", (e) => {
-      handleFiles(e.target.files);
-    });
-  }
-
-  // --- Drag & Drop ---
-  if (dropZone && fileInput) {
-    // 1. Клик открывает выбор файлов (твоя новая фишка)
-    dropZone.addEventListener("click", () => {
-      fileInput.click();
-    });
-
-    // 2. ВАЖНО: Разрешаем перетаскивание (без этого drop не сработает!)
-    dropZone.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      dropZone.classList.add("drag-over");
-    });
-
-    // 3. Убираем подсветку, если увели файл
-    dropZone.addEventListener("dragleave", () => {
-      dropZone.classList.remove("drag-over");
-    });
-
-    // 4. Обработка броска файла
-    dropZone.addEventListener("drop", (e) => {
-      e.preventDefault();
-      dropZone.classList.remove("drag-over");
-      // Важно остановить всплытие, чтобы не открылся клик
-      e.stopPropagation();
-
-      if (e.dataTransfer.files.length > 0) {
-        handleFiles(e.dataTransfer.files);
-      }
-    });
-  }
-
-  // --- Логика обработки файлов ---
-  function handleFiles(files) {
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
-
-    Array.from(files).forEach((file) => {
-      if (!allowedTypes.includes(file.type)) {
-        alert("File format not supported! Please use JPG, PNG or GIF.");
+  // --- ЗАГРУЗКА НА СЕРВЕР ---
+  async function uploadFile(file) {
+    if (!file.type.startsWith('image/')) {
+        alert("Only images are allowed!");
         return;
-      }
+    }
 
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        const newRecord = {
-          name: file.name,
-          src: event.target.result,
-          id: Date.now(),
-        };
+    // UI: Start Upload
+    dropZone.classList.add('uploading');
+    const originalText = dropText.textContent;
+    dropText.textContent = `Uploading ${file.name}...`;
+    dropZone.style.pointerEvents = "none";
 
-        saveImageToStorage(newRecord);
+    try {
+        const response = await api.uploadFile(file);
 
-        if (resultInput) {
-          resultInput.value = `https://sharefile.xyz/${file.name}`;
-        }
+        // Успех!
+        const fullUrl = api.getImageUrl(response.url);
+        resultLinkInput.value = fullUrl;
 
-        // 2. ВАЖНО: После успешной загрузки снова проверяем статус!
-        // Кнопка "Images" должна появиться прямо сейчас
-        checkGalleryStatus();
+        dropText.textContent = "Upload successful! Select another file.";
 
-        alert("Uploaded successfully!");
-      };
-      reader.readAsDataURL(file);
-    });
+        // ОБНОВЛЯЕМ ГАЛЕРЕЮ СНИЗУ
+        await loadMyRecentGallery();
+
+    } catch (err) {
+        console.error("Upload failed:", err);
+        alert(`Upload failed: ${err.message}`);
+        dropText.textContent = "Error. Try again.";
+    } finally {
+        // UI: Finish Upload
+        dropZone.classList.remove('uploading');
+        dropZone.style.pointerEvents = "auto";
+        fileInput.value = "";
+    }
   }
 
-  // --- Кнопка Копировать ---
-  if (copyBtn && resultInput) {
-    copyBtn.addEventListener("click", () => {
-      if (resultInput.value) {
-        navigator.clipboard
-          .writeText(resultInput.value)
-          .then(() => {
-            const originalText = copyBtn.innerText;
-            copyBtn.innerText = "COPIED!";
-            setTimeout(() => {
-              copyBtn.innerText = originalText;
-            }, 2000);
-          })
-          .catch((err) => console.error("Copy failed", err));
-      }
+  // --- КОПИРОВАНИЕ ССЫЛКИ (Main Page) ---
+  copyBtn.addEventListener("click", () => {
+    const text = resultLinkInput.value;
+    if (!text) return;
+
+    navigator.clipboard.writeText(text).then(() => {
+      const oldText = copyBtn.textContent;
+      copyBtn.textContent = "COPIED!";
+      copyBtn.style.backgroundColor = "#10b981";
+      setTimeout(() => {
+        copyBtn.textContent = oldText;
+        copyBtn.style.backgroundColor = "";
+      }, 2000);
     });
+  });
+
+  // --- ЛОГИКА ГАЛЕРЕИ (GRID) ---
+  async function loadMyRecentGallery() {
+      if (!gridContainer) return;
+
+      try {
+          const images = await api.get('/media/my?limit=9&offset=0');
+          renderGrid(images);
+      } catch (err) {
+          console.error("Failed to load my gallery:", err);
+      }
+  }
+
+  function renderGrid(images) {
+      gridContainer.innerHTML = "";
+      const count = images.length;
+
+      if (count === 0) {
+          gridContainer.innerHTML = "<p style='color: gray; text-align: center;'>No uploads yet.</p>";
+          return;
+      }
+
+      let sliceSizes = [];
+      if (count === 3) sliceSizes = [2, 1];
+      else if (count === 4) sliceSizes = [2, 2];
+      else {
+        let remaining = count;
+        while (remaining > 0) {
+          const size = remaining >= 3 ? 3 : remaining;
+          sliceSizes.push(size);
+          remaining -= size;
+        }
+      }
+
+      let currentIndex = 0;
+      sliceSizes.forEach((size) => {
+        const chunk = images.slice(currentIndex, currentIndex + size);
+        currentIndex += size;
+
+        const rowDiv = document.createElement("div");
+        rowDiv.className = `gallery-row row-len-${chunk.length}`;
+
+        chunk.forEach((file) => {
+          const card = document.createElement("div");
+          card.className = "gallery-card";
+
+          // FIX: Используем openViewer вместо window.open
+          card.onclick = () => openViewer(file);
+
+          const img = document.createElement("img");
+          img.src = api.getImageUrl(file.src);
+          img.alt = file.filename;
+          img.loading = "lazy";
+
+          card.appendChild(img);
+          rowDiv.appendChild(card);
+        });
+
+        gridContainer.appendChild(rowDiv);
+      });
   }
 });

@@ -14,10 +14,26 @@
     <link rel="stylesheet" href="css/main.css" />
     <link rel="stylesheet" href="css/upload.css" />
     <link rel="stylesheet" href="css/gallery.css" />
+    <link rel="stylesheet" href="css/auth.css" />
   </head>
   <body>
     <div class="upload-wrapper">
       <div class="header">
+        <!-- Кнопка профиля (Login / Logout) -->
+        <button id="profile-btn" class="profile-btn" title="Profile"></button>
+
+        <!-- DROPDOWN MENU -->
+        <div id="profile-dropdown" class="profile-dropdown">
+            <div class="dropdown-header">
+                <strong>Signed in as</strong>
+                <span id="user-email-display">Loading...</span>
+            </div>
+            <a href="upload_form.html" class="dropdown-item">Upload</a>
+            <a href="images.html" class="dropdown-item">My Gallery</a>
+            <div style="border-top: 1px solid var(--border-line); margin: 5px 0;"></div>
+            <button id="logout-btn" class="dropdown-item danger">Sign out</button>
+        </div>
+
         <h1><a href="index.html">Upload Photos</a></h1>
         <h2>Upload selfies, memes, or any fun pictures here.</h2>
       </div>
@@ -41,9 +57,62 @@
 
         <div id="gallery-list"></div>
       </div>
+
+    </div> <!-- END upload-wrapper -->
+
+    <!-- IMAGE VIEWER (Moved outside wrapper) -->
+    <div id="image-viewer" class="image-viewer" style="display: none">
+      <div class="viewer-content">
+        <img id="viewer-img" src="" alt="Full View" />
+        <h3 id="viewer-title">Filename.jpg</h3>
+
+        <div class="viewer-controls">
+          <button class="btn-back" id="btn-back-gallery">
+            ← Back
+          </button>
+          <button class="btn-copy" id="btn-copy-url-viewer">Copy URL</button>
+        </div>
+      </div>
     </div>
 
-    <script src="js/storage.js"></script>
+    <!-- MODAL: AUTH (LOGIN + REGISTER) -->
+    <dialog id="login-modal">
+      <span class="close-modal-btn" onclick="document.getElementById('login-modal').close()">×</span>
+      <div id="view-login">
+        <h3>Welcome Back</h3>
+        <form id="login-form" class="auth-form">
+          <input type="email" name="email" placeholder="Email" class="auth-input" required />
+          <div class="input-wrapper">
+            <input type="password" name="password" placeholder="Password" class="auth-input" required />
+            <button type="button" class="toggle-password-btn" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg></button>
+          </div>
+          <div class="auth-error" id="login-error"></div>
+          <button type="submit" class="auth-btn">Login</button>
+        </form>
+        <div class="auth-footer">No account? <a href="#" id="link-to-register">Register</a></div>
+      </div>
+      <div id="view-register" style="display: none;">
+        <h3>Create Account</h3>
+        <form id="register-form" class="auth-form">
+          <input type="email" name="email" placeholder="Email" class="auth-input" required />
+          <div class="input-wrapper">
+            <input type="password" name="password" placeholder="Password" class="auth-input" required minlength="8" />
+            <button type="button" class="toggle-password-btn" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg></button>
+            <small class="hint">Min. 8 characters</small>
+          </div>
+          <div class="input-wrapper">
+            <input type="password" name="confirm_password" placeholder="Confirm Password" class="auth-input" required minlength="8" />
+            <button type="button" class="toggle-password-btn" tabindex="-1"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg></button>
+          </div>
+          <div class="auth-error" id="register-error"></div>
+          <button type="submit" class="auth-btn">Sign Up</button>
+        </form>
+        <div class="auth-footer">Already have an account? <a href="#" id="link-to-login">Login</a></div>
+      </div>
+    </dialog>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/images.js"></script>
   </body>
 </html>
