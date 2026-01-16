@@ -38,6 +38,7 @@ services:
       # Папка для проверки домена (webroot)
       - ./certbot/www:/var/www/certbot:ro
       # Сами сертификаты (монтируем с хоста)
+      # ИСПРАВЛЕНО: Берем из системной папки /etc/letsencrypt
       - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       backend:
