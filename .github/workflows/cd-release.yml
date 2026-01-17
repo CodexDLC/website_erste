@@ -29,13 +29,24 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and Push Image
+      # === Build Backend Image ===
+      - name: Build and Push Backend Image
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./Dockerfile
           push: true
-          # Используем переменную в нижнем регистре
           tags: ghcr.io/${{ env.REPO_LOWER }}:latest
+
+      # === НОВОЕ: Build Nginx Image ===
+      - name: Build and Push Nginx Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./nginx/Dockerfile
+          push: true
+          tags: ghcr.io/${{ env.REPO_LOWER }}-nginx:latest
+      # =================================
 
       - name: SSH Deploy
         uses: appleboy/ssh-action@master
@@ -59,7 +70,9 @@ jobs:
             # 3. Переменные и запуск
             # Используем переменную REPO_LOWER, переданную через envs
             export DOCKER_IMAGE_BACKEND=ghcr.io/$REPO_LOWER:latest
+            export DOCKER_IMAGE_NGINX=ghcr.io/$REPO_LOWER-nginx:latest
             
+            # Pull и запуск
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d --remove-orphans --wait
             
