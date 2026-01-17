@@ -26,6 +26,6 @@ data/
 docs/
 README.MD
 
-# Frontend (if building backend only)
-frontend/
+# Frontend (Removed from ignore to allow Nginx build)
+# frontend/  <-- COMMENTED OUT
 node_modules/
