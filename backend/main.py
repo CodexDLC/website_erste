@@ -3,8 +3,9 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from typing import Any
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from loguru import logger
 
 from .core.config import settings
@@ -36,13 +37,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 # --- DOCS CONFIGURATION ---
-# Если DEBUG=False, отключаем документацию (None)
 docs_url = "/docs" if settings.DEBUG else None
 redoc_url = "/redoc" if settings.DEBUG else None
 openapi_url = f"{settings.API_V1_STR}/openapi.json" if settings.DEBUG else None
 
 # --- GLOBAL ERROR RESPONSES ---
-# Описываем, как выглядят ошибки в Swagger
 responses: dict[int | str, dict[str, Any]] = {
     400: {"model": ErrorResponse, "description": "Bad Request"},
     401: {"model": ErrorResponse, "description": "Unauthorized"},
@@ -61,20 +60,18 @@ app = FastAPI(
     openapi_url=openapi_url,
     openapi_tags=tags_metadata,
     lifespan=lifespan,
-    responses=responses, # Подключаем глобальные схемы ошибок
+    responses=responses,
 )
 
 # --- CORS SETUP ---
-# Если DEBUG=True, разрешаем вообще всё (для локальной разработки)
 if settings.DEBUG:
     app.add_middleware(
         CORSMiddleware,
-        allow_origin_regex=".*",  # Разрешает любой Origin
+        allow_origin_regex=".*",
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
-# Иначе используем список из конфига
 elif settings.ALLOWED_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
@@ -84,8 +81,29 @@ elif settings.ALLOWED_ORIGINS:
         allow_headers=["*"],
     )
 
-# Mypy complains about incompatible type for exception handler, but it works at runtime
+# --- EXCEPTION HANDLERS ---
+
+# 1. Наши кастомные ошибки (бизнес-логика)
 app.add_exception_handler(BaseAPIException, api_exception_handler) # type: ignore
+
+# 2. Глобальный перехватчик всех остальных ошибок (Last Resort)
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    # Если DEBUG=True, позволяем FastAPI показать стандартную страницу с трейсбеком (удобно для разработки)
+    if settings.DEBUG:
+        raise exc
+    
+    # В проде логируем ошибку и отдаем нейтральный JSON
+    logger.exception(f"🔥 Unhandled exception: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": {
+                "code": "internal_server_error",
+                "message": "An unexpected error occurred. Please try again later."
+            }
+        },
+    )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 

@@ -1,4 +1,3 @@
-# backend/core/logger.py
 import logging
 import sys
 from types import FrameType
@@ -9,6 +8,10 @@ from .config import settings
 
 
 class InterceptHandler(logging.Handler):
+    """
+    Intercepts standard logging messages and redirects them to Loguru.
+    """
+
     def emit(self, record: logging.LogRecord) -> None:
         try:
             level: str | int = logger.level(record.levelname).name
@@ -28,9 +31,14 @@ class InterceptHandler(logging.Handler):
 
 
 def setup_loguru() -> None:
+    """
+    Configures Loguru logger.
+    Sets up sinks for console, debug file, and error JSON file.
+    Intercepts standard library logging.
+    """
     logger.remove()
 
-    # Console
+    # --- Console Sink ---
     logger.add(
         sink=sys.stdout,
         level=settings.LOG_LEVEL_CONSOLE.upper(),
@@ -43,8 +51,7 @@ def setup_loguru() -> None:
         ),
     )
 
-    # File (Debug)
-    # Cast Path to str to satisfy mypy overload resolution
+    # --- File Sink (Debug) ---
     logger.add(
         sink=str(settings.log_file_debug),
         level=settings.LOG_LEVEL_FILE.upper(),
@@ -53,7 +60,7 @@ def setup_loguru() -> None:
         format="{time} | {level: <8} | {name}:{function}:{line} - {message}",
     )
 
-    # File (Errors JSON)
+    # --- File Sink (Errors JSON) ---
     logger.add(
         sink=str(settings.log_file_errors),
         level="ERROR",
@@ -62,11 +69,13 @@ def setup_loguru() -> None:
         compression="zip",
     )
 
+    # --- Intercept Standard Logging ---
     logging.basicConfig(handlers=[InterceptHandler()], level=0)
 
     logging.getLogger("uvicorn.access").handlers = [InterceptHandler()]
     logging.getLogger("uvicorn.error").handlers = [InterceptHandler()]
 
+    # Third-party loggers configuration
     logging.getLogger("aiogram").setLevel(logging.INFO)
     logging.getLogger("sqlalchemy").setLevel(logging.WARNING)
     logging.getLogger("httpx").setLevel(logging.WARNING)

@@ -1,5 +1,11 @@
-// js/auth.js
-// Управляет логикой авторизации (Login Modal, Register View, Profile Button, Password Toggle, Dropdown)
+/**
+ * js/auth.js
+ * Handles Authentication UI logic.
+ * - Login/Register Modals
+ * - Profile Button & Dropdown
+ * - Password Visibility Toggle
+ * - Auto-login via URL params
+ */
 
 document.addEventListener('DOMContentLoaded', () => {
     initProfileButton();
@@ -7,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkAutoLogin();
     initPasswordToggles();
 
-    // Закрытие меню при клике вне его
+    // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
         const dropdown = document.getElementById('profile-dropdown');
         const btn = document.getElementById('profile-btn');
@@ -19,6 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+/**
+ * Initialize password visibility toggles (eye icon).
+ */
 function initPasswordToggles() {
     const toggles = document.querySelectorAll('.toggle-password-btn');
     toggles.forEach(btn => {
@@ -36,6 +45,9 @@ function initPasswordToggles() {
     });
 }
 
+/**
+ * Check if URL has ?login=true to open modal automatically.
+ */
 function checkAutoLogin() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('login') === 'true') {
@@ -48,6 +60,9 @@ function checkAutoLogin() {
     }
 }
 
+/**
+ * Initialize Profile Button state (Guest vs Logged In).
+ */
 async function initProfileButton() {
     const btn = document.getElementById('profile-btn');
     const modal = document.getElementById('login-modal');
@@ -58,34 +73,30 @@ async function initProfileButton() {
     if (!btn) return;
 
     if (api.isLoggedIn()) {
-        // ЗАЛОГИНЕН
+        // LOGGED IN STATE
         btn.classList.add('logged-in');
         btn.title = "Profile";
 
-        // Пытаемся загрузить данные пользователя
         try {
             const user = await api.get('/users/me');
             if (user && user.email) {
-                // Рисуем аватарку (Первая буква)
+                // Avatar: First letter of email
                 const letter = user.email.charAt(0).toUpperCase();
                 btn.textContent = letter;
                 btn.classList.add('avatar-mode');
 
-                // Обновляем email в меню
                 if (emailDisplay) emailDisplay.textContent = user.email;
             }
         } catch (err) {
-            console.warn("Failed to load user profile:", err);
-            // Если токен протух, api.js сам выкинет на логин, так что тут ок
+            console.warn("Auth: Failed to load profile", err);
         }
 
-        // Логика клика (Открыть меню)
+        // Toggle Dropdown
         btn.onclick = (e) => {
             e.stopPropagation();
             if (dropdown) dropdown.classList.toggle('active');
         };
 
-        // Логика Logout
         if (logoutBtn) {
             logoutBtn.onclick = () => {
                 api.logout();
@@ -93,7 +104,7 @@ async function initProfileButton() {
         }
 
     } else {
-        // ГОСТЬ
+        // GUEST STATE
         btn.classList.remove('logged-in');
         btn.classList.remove('avatar-mode');
         btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
@@ -108,11 +119,12 @@ async function initProfileButton() {
     }
 }
 
-// --- HELPER: SHOW ERROR ---
+/**
+ * Display error message in the form.
+ */
 function showError(formId, message) {
     const errorBlock = document.getElementById(formId + '-error');
     if (errorBlock) {
-        // Убираем "Registration failed: " если оно есть, чтобы не дублировать
         const cleanMessage = message.replace("Registration failed: ", "").replace("Login failed: ", "");
         errorBlock.textContent = cleanMessage;
         errorBlock.style.display = 'block';
@@ -128,6 +140,9 @@ function clearErrors() {
     });
 }
 
+/**
+ * Initialize Login/Register Modal logic.
+ */
 function initAuthModalLogic() {
     const modal = document.getElementById('login-modal');
     if (!modal) return;
@@ -156,7 +171,7 @@ function initAuthModalLogic() {
         };
     }
 
-    // --- LOGIN ---
+    // --- LOGIN FORM ---
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
         loginForm.onsubmit = async (e) => {
@@ -179,7 +194,7 @@ function initAuthModalLogic() {
         };
     }
 
-    // --- REGISTER ---
+    // --- REGISTER FORM ---
     const regForm = document.getElementById('register-form');
     if (regForm) {
         regForm.onsubmit = async (e) => {

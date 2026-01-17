@@ -25,13 +25,13 @@ class MediaRepository:
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def create_file(self, hash: str, size_bytes: int, mime_type: str, path: str) -> File:
+    async def create_file(self, file_hash: str, size_bytes: int, mime_type: str, path: str) -> File:
         """
         Register a new physical file in the database.
         Initial ref_count is 0 (will be incremented when Image is created).
         """
         file = File(
-            hash=hash,
+            hash=file_hash,
             size_bytes=size_bytes,
             mime_type=mime_type,
             path=path,
@@ -75,7 +75,6 @@ class MediaRepository:
         await self.session.refresh(image)
 
         # Explicitly load the file relationship to avoid lazy loading issues later
-        # This is a bit of a hack, usually we return what we created, but for consistency:
         stmt_load = select(Image).where(Image.id == image.id).options(selectinload(Image.file))
         result = await self.session.execute(stmt_load)
         return result.scalar_one()

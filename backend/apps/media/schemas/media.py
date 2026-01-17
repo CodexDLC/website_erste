@@ -1,10 +1,12 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, computed_field
+from pydantic import computed_field
+
+from backend.core.schemas.base import BaseResponse
 
 
-class FileRead(BaseModel):
+class FileRead(BaseResponse):
     """
     Schema for reading File metadata (CAS).
     """
@@ -14,10 +16,8 @@ class FileRead(BaseModel):
     mime_type: str
     created_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
 
-
-class ImageRead(BaseModel):
+class ImageRead(BaseResponse):
     """
     Schema for reading Image metadata (User Asset).
     """
@@ -25,32 +25,23 @@ class ImageRead(BaseModel):
     id: UUID
     filename: str
     created_at: datetime
-    # We might want to include file details here
     file: FileRead
-
-    model_config = ConfigDict(from_attributes=True)
 
     @computed_field
     def url(self) -> str:
         """
-        Full URL to the original image.
-        Assumes the API is mounted at /api/v1/media or similar,
-        but here we return relative path from the router root.
-        Frontend should prepend API base URL if needed, or we return absolute path if we knew the host.
-        For now, we return relative path to the media router.
+        Direct URL to the original image served by Nginx.
+        Path: /media/storage/ab/cd/hash
         """
-        # Assuming the router is mounted at /media
-        # We return the relative path that the frontend can use.
-        # Since we don't know the full domain here easily without request context,
-        # we'll return a path relative to the API root or absolute path if we assume a prefix.
-
-        # Let's assume standard API structure: /api/v1/media/{hash}
-        # But to be safe and relative-friendly:
-        return f"/api/v1/media/{self.file.hash}"
+        h = self.file.hash
+        # Sharding logic: first 2 chars, next 2 chars
+        return f"/media/storage/{h[:2]}/{h[2:4]}/{h}"
 
     @computed_field
     def src(self) -> str:
         """
-        URL to the thumbnail (for frontend gallery).
+        Direct URL to the thumbnail served by Nginx.
+        Path: /media/storage/ab/cd/hash_thumb.jpg
         """
-        return f"/api/v1/media/{self.file.hash}/thumb"
+        h = self.file.hash
+        return f"/media/storage/{h[:2]}/{h[2:4]}/{h}_thumb.jpg"

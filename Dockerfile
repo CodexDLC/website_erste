@@ -3,7 +3,7 @@ FROM python:3.12-slim AS builder
 
 WORKDIR /app
 
-# Системные зависимости для сборки
+# System dependencies for build
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
@@ -15,13 +15,13 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Создаём виртуальное окружение
+# Create virtual environment
 RUN python -m venv /app/.venv
 
-# Копируем requirements из папки backend
+# Copy requirements
 COPY backend/requirements.txt .
 
-# Устанавливаем зависимости в venv
+# Install dependencies
 RUN /app/.venv/bin/pip install --no-cache-dir -r requirements.txt
 
 # === STAGE 2: Runtime ===
@@ -29,7 +29,7 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Системные зависимости для runtime
+# System dependencies for runtime
 RUN apt-get update && apt-get install -y \
     libpq5 \
     curl \
@@ -39,28 +39,30 @@ RUN apt-get update && apt-get install -y \
     libpng16-16 \
     && rm -rf /var/lib/apt/lists/*
 
-# Создаём non-root пользователя
+# Create non-root user
 RUN useradd -m -u 1000 appuser
 
-# Копируем venv из builder
+# Copy venv from builder
 COPY --from=builder /app/.venv /app/.venv
 
-# Копируем код приложения
+# Copy application code
 COPY backend /app/backend
 
-# Создаём директории для данных
+# Create data directories
 RUN mkdir -p /app/data/uploads /app/data/logs && \
     chown -R appuser:appuser /app
 
-# Переключаемся на appuser
+# Switch to non-root user
 USER appuser
 
-# Добавляем venv в PATH
+# Add venv to PATH
 ENV PATH="/app/.venv/bin:$PATH"
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
-# Команда запуска
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start command
+# --proxy-headers: Trust X-Forwarded-For headers from Nginx
+# --forwarded-allow-ips='*': Trust any proxy (Docker IP is dynamic)
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--forwarded-allow-ips='*'"]

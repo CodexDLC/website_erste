@@ -2,34 +2,43 @@
 
 # ✅ Tasks & Backlog
 
-Оперативный список задач. Глобальный прогресс см. в **[🗺️ Roadmap](../roadmap.md)**.
+Оперативный список задач.
+История изменений ведется в **[📜 CHANGELOG.md](../../../CHANGELOG.md)**.
 
-## 🏃 Active Sprint (Phase 4: Frontend Integration)
-Задачи, которые нужно выполнить в первую очередь для связки с фронтендом.
+## 🏁 Completed (v1.0 MVP)
+Задачи, выполненные в рамках релиза v1.0.
 
-*   [x] **[Frontend API Integration](./frontend_api_integration.md)** — Перевод фронтенда с localStorage на реальный API (Login, Upload, Gallery).
+### Infrastructure & DevOps
+*   [x] **[CI/CD Pipeline](./ci_cd.md)** — Настройка GitHub Actions (Build, Test, Deploy).
+*   [x] **[Migrate Nginx to Docker Image](./nginx_docker_migration.md)** — Упаковка конфигов в образ.
+*   [x] **[Backend Optimization](./backend_optimization.md)** — DB Pool (SQLAlchemy), Structured Logging (Loguru).
+*   [x] **[Monitoring Setup](./monitoring_setup.md)** — Подготовка логов для Grafana/Loki (JSON/Key-Value).
 
-## 💡 Future Ideas (v2.0)
+### Frontend & Integration
+*   [x] **[Frontend API Integration](./frontend_api_integration.md)** — Перевод фронтенда с localStorage на реальный API.
+*   [x] **[Frontend UX Improvements](./frontend_ux_improvements.md)** — Базовые состояния загрузки, валидация форм.
+
+### Security & Quality
+*   [x] [Fix Race Condition in Registration](./race_condition_registration.md) — Обработка IntegrityError.
+*   [x] [Critical Fixes (P0)](./critical_fixes.md) — Исправления критических багов.
+*   [x] [Backend Testing Strategy](./testing.md) — Unit-тесты для Auth и Media.
+*   [x] [Swagger Error Schemas](./swagger_errors.md) — Описание ошибок в документации API.
+*   [x] [Secure Swagger UI](./secure_swagger.md) — Отключение Swagger в проде (через DEBUG=False).
+
+## 📋 Backlog (v0.2.0 Candidates)
+Задачи, запланированные на следующую версию.
+
+### Security & Privacy
+*   [ ] **[Privacy & Security Hardening](./privacy_security.md)** — EXIF Stripping, Content-Security-Policy (CSP) tuning.
+*   [ ] [Secure Auth Storage (HttpOnly Cookies)](./auth_cookies.md) — Переезд с localStorage на Cookies (повышение безопасности).
+
+### Features
 *   [ ] **[Social Mechanics (Likes)](./social_features.md)** — Лайки и популярное.
 *   [ ] **[Headless Mode (Microservice)](./headless_mode.md)** — Режим "Только API" (S3 replacement) по API Key.
+*   [ ] [Refactor User Creation Flags](./user_flags.md) — Убрать хардкод флагов is_active/is_superuser (для Админки).
 
-## 📋 Backlog (Phase 5: Stabilization)
-Задачи по улучшению качества, тесты и CI/CD.
-
-### Documentation & API
-*   [x] [Swagger Error Schemas](./swagger_errors.md) — Описать кастомные схемы ошибок в документации API.
-*   [x] [Secure Swagger UI](./secure_swagger.md) — Скрыть или защитить паролем документацию на проде.
-
-### Security
-*   [ ] [Secure Auth Storage (HttpOnly Cookies)](./auth_cookies.md) — Переезд с localStorage на Cookies.
-
-### Testing & Infrastructure
-*   [x] [Backend Testing Strategy](./testing.md) — Написание тестов для Auth и Media.
-*   [ ] [CI/CD Pipeline](./ci_cd.md) — Настройка GitHub Actions.
-
-### Code Quality & Refactoring
-*   [ ] [Fix Race Condition in Registration](./race_condition_registration.md) — Обработка IntegrityError.
-*   [ ] [Refactor User Creation Flags](./user_flags.md) — Убрать хардкод флагов is_active/is_superuser.
+### Frontend
+*   [ ] **[Frontend UX Improvements](./frontend_ux_improvements.md)** — Pagination, A11y, Skeleton Loaders.
 
 ---
 [🏠 Вернуться на главную](../../index.md)

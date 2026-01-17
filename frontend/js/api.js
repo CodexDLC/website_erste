@@ -1,36 +1,47 @@
-// frontend/js/api.js
+/**
+ * frontend/js/api.js
+ * Core API Client for communicating with the Backend.
+ * Handles Authentication, Request formatting, and Error parsing.
+ */
 
 class ApiClient {
     constructor() {
-        // PROD MODE (Docker + Nginx):
-        // Все запросы идут через Nginx (порт 80), который проксирует /api/ на бэкенд.
-        // Поэтому baseUrl должен быть относительным или указывать на текущий хост.
+        // Base URL for API requests.
+        // Relative path works because Nginx proxies /api/v1 to the backend.
         this.baseUrl = '/api/v1';
-
         this.tokenKey = 'access_token';
     }
 
-    // --- Хелпер для получения полного URL картинки ---
+    /**
+     * Helper to resolve full image URL.
+     * @param {string} path - Relative path from backend response.
+     * @returns {string} - Full URL or relative path.
+     */
     getImageUrl(path) {
         if (!path) return '';
         if (path.startsWith('http')) return path;
-
-        // Если path уже содержит /api/v1, просто возвращаем его как есть (относительный путь)
-        // Браузер сам подставит текущий домен (http://localhost)
         return path;
     }
 
-    // --- Приватный метод для выполнения запросов ---
+    /**
+     * Internal method to execute fetch requests.
+     * @param {string} method - HTTP Method (GET, POST, etc.)
+     * @param {string} endpoint - API Endpoint (e.g., '/media/feed')
+     * @param {object|FormData|URLSearchParams} body - Request payload
+     * @param {boolean} isJson - Whether to send as JSON (default: true)
+     * @returns {Promise<any>} - JSON response
+     * @private
+     */
     async _request(method, endpoint, body = null, isJson = true) {
         const headers = {};
 
-        // 1. Автоматически цепляем токен, если он есть
+        // 1. Attach Authorization header if token exists
         const token = localStorage.getItem(this.tokenKey);
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
         }
 
-        // 2. Настройка заголовков для тела запроса
+        // 2. Prepare request body
         let requestBody = body;
 
         if (body) {
@@ -38,13 +49,10 @@ class ApiClient {
                 headers['Content-Type'] = 'application/json';
                 requestBody = JSON.stringify(body);
             }
-            // Если отправляем FormData (файлы) или URLSearchParams (логин),
-            // браузер сам выставит нужный Content-Type, мы его не трогаем.
+            // For FormData or URLSearchParams, browser sets Content-Type automatically.
         }
 
         try {
-            // ВАЖНО: Убираем порт 8000, если он вдруг где-то проскакивает
-            // Запрос должен идти на http://localhost/api/v1/... (порт 80)
             const url = `${this.baseUrl}${endpoint}`;
 
             const response = await fetch(url, {
@@ -53,41 +61,50 @@ class ApiClient {
                 body: requestBody
             });
 
-            // 3. Перехватчик: Если токен протух (401), выкидываем на логин
+            // 3. Handle 401 Unauthorized (Token expired)
             if (response.status === 401) {
-                console.warn('Unauthorized! Opening login...');
+                console.warn('API: Unauthorized. Triggering login flow.');
                 this.handleUnauthorized();
-                // Пытаемся прочитать сообщение об ошибке, если оно есть
                 const err = await this._parseError(response);
                 throw new Error(err || "Unauthorized");
             }
 
-            // Обработка ошибок API
+            // 4. Handle other API errors
             if (!response.ok) {
                 const errorMessage = await this._parseError(response);
                 throw new Error(errorMessage);
             }
 
+            // 5. Handle 204 No Content
+            if (response.status === 204) {
+                return null;
+            }
+
             return await response.json();
         } catch (err) {
-            console.error(`API Error [${endpoint}]:`, err);
+            console.error(`API Error [${endpoint}]:`, err.message);
             throw err;
         }
     }
 
-    // --- Хелпер для парсинга ошибок (Smart Error Handling) ---
+    /**
+     * Parses error response from Backend.
+     * Supports standard FastAPI errors and custom BaseAPIException format.
+     * @param {Response} response
+     * @returns {Promise<string>} - Human-readable error message
+     * @private
+     */
     async _parseError(response) {
         try {
             const data = await response.json();
 
-            // 1. Наш кастомный формат (backend/core/exceptions.py)
+            // Custom format (backend/core/exceptions.py)
             if (data.error && data.error.message) {
                 return data.error.message;
             }
 
-            // 2. Стандартный формат FastAPI (HTTPException)
+            // Standard FastAPI format (HTTPException)
             if (data.detail) {
-                // Если detail - это массив (Validation Error), склеиваем
                 if (Array.isArray(data.detail)) {
                     return data.detail.map(e => `${e.loc.join('.')}: ${e.msg}`).join('\n');
                 }
@@ -100,42 +117,49 @@ class ApiClient {
         }
     }
 
-    // --- Публичные методы ---
+    // --- Public Methods ---
 
-    // Метод для получения списка (Галерея, Фид)
+    /**
+     * Generic GET request.
+     * @param {string} endpoint
+     */
     async get(endpoint) {
         return this._request('GET', endpoint);
     }
 
-    // Метод для удаления
+    /**
+     * Generic DELETE request.
+     * @param {string} endpoint
+     */
     async delete(endpoint) {
         return this._request('DELETE', endpoint);
     }
 
-    // --- Специализированные методы (под ваш Backend) ---
+    // --- Domain Specific Methods ---
 
     /**
-     * Логин под OAuth2PasswordRequestForm (FastAPI)
-     * ВАЖНО: Отправляет данные как x-www-form-urlencoded, а не JSON!
+     * Authenticate user (OAuth2 Password Flow).
+     * Sends data as x-www-form-urlencoded.
+     * @param {string} email
+     * @param {string} password
      */
     async login(email, password) {
-        // FastAPI ожидает поле 'username', даже если мы используем email
         const formData = new URLSearchParams();
-        formData.append('username', email);
+        formData.append('username', email); // FastAPI expects 'username'
         formData.append('password', password);
 
-        // false в конце означает "не JSON"
         const data = await this._request('POST', '/auth/login', formData, false);
 
-        // Сохраняем токен
         if (data.access_token) {
             localStorage.setItem(this.tokenKey, data.access_token);
-            window.location.reload(); // Обновляем страницу, чтобы показать интерфейс юзера
+            window.location.reload();
         }
     }
 
     /**
-     * Регистрация (JSON)
+     * Register new user.
+     * @param {string} email
+     * @param {string} password
      */
     async register(email, password) {
         return await this._request('POST', '/auth/register', {
@@ -145,18 +169,17 @@ class ApiClient {
     }
 
     /**
-     * Загрузка файла
-     * ВАЖНО: Отправляет Multipart/form-data
+     * Upload a file (Multipart/form-data).
+     * @param {File} file
      */
     async uploadFile(file) {
         const formData = new FormData();
-        formData.append('file', file); // Имя поля 'file' должно совпадать с аргументом в media.py
+        formData.append('file', file);
 
-        // false означает "не JSON", браузер сам поставит boundary
         return await this._request('POST', '/media/upload', formData, false);
     }
 
-    // --- Утилиты ---
+    // --- Utilities ---
 
     logout() {
         localStorage.removeItem(this.tokenKey);
@@ -168,10 +191,8 @@ class ApiClient {
     }
 
     handleUnauthorized() {
-        // Пытаемся открыть модалку, если она есть в DOM
         const modal = document.getElementById('login-modal');
         if (modal) {
-            // Сбрасываем на логин, если вдруг открыта регистрация
             const viewLogin = document.getElementById('view-login');
             const viewRegister = document.getElementById('view-register');
             if (viewLogin && viewRegister) {
@@ -179,12 +200,9 @@ class ApiClient {
                 viewRegister.style.display = 'none';
             }
             modal.showModal();
-        } else {
-            // Если модалки нет (редкий кейс), просто алерт
-            // alert("Session expired. Please login.");
         }
     }
 }
 
-// Экспортируем глобальный инстанс
+// Export global instance
 const api = new ApiClient();
