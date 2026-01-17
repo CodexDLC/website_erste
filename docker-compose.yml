@@ -12,6 +12,7 @@ services:
       - LOG_LEVEL_CONSOLE=${LOG_LEVEL_CONSOLE:-INFO}
       - LOG_LEVEL_FILE=${LOG_LEVEL_FILE:-DEBUG}
       - LOG_ROTATION=${LOG_ROTATION:-10MB}
+      - SITE_URL=${SITE_URL}
     volumes:
       - uploads:/app/data/uploads
       - logs:/app/data/logs
