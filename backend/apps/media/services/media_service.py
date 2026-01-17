@@ -1,5 +1,4 @@
 import hashlib
-import mimetypes
 import os
 import shutil
 import uuid
