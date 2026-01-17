@@ -32,12 +32,22 @@ class ImageRead(BaseResponse):
     def url(self) -> str:
         """
         Direct absolute URL to the original image served by Nginx.
-        Format: {SITE_URL}/media/storage/ab/cd/hash
+        Format: {SITE_URL}/media/storage/ab/cd/hash.ext
         """
         h = self.file.hash
+        
+        # Map mime_type to extension for URL generation
+        # This must match ALLOWED_MIME_TYPES in MediaService
+        mime_map = {
+            "image/jpeg": ".jpg",
+            "image/png": ".png",
+            "image/gif": ".gif",
+            "image/webp": ".webp",
+        }
+        ext = mime_map.get(self.file.mime_type, "")
+        
         # Sharding logic: first 2 chars, next 2 chars
-        # settings.SITE_URL is guaranteed to have no trailing slash
-        return f"{settings.SITE_URL}/media/storage/{h[:2]}/{h[2:4]}/{h}"
+        return f"{settings.SITE_URL}/media/storage/{h[:2]}/{h[2:4]}/{h}{ext}"
 
     @computed_field
     def src(self) -> str:

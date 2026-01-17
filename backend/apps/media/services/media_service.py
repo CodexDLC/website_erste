@@ -30,10 +30,10 @@ class MediaService:
     """
 
     ALLOWED_MIME_TYPES = {
-        "image/jpeg",
-        "image/png",
-        "image/gif",
-        "image/webp",
+        "image/jpeg": ".jpg",
+        "image/png": ".png",
+        "image/gif": ".gif",
+        "image/webp": ".webp",
     }
 
     def __init__(self, repository: IMediaRepository):
@@ -88,7 +88,10 @@ class MediaService:
 
             else:
                 logger.info(f"MediaService | action=deduplication_miss hash={file_hash}")
-                target_path = self._get_storage_path(file_hash)
+                
+                # Determine extension
+                ext = self.ALLOWED_MIME_TYPES.get(mime_type, "")
+                target_path = self._get_storage_path(file_hash, ext)
 
                 # Atomic Move: temp -> storage
                 await run_in_threadpool(shutil.move, str(temp_path), str(target_path))
@@ -162,7 +165,19 @@ class MediaService:
             raise PermissionDeniedException(detail="You do not own this image")
 
         file_hash = image.file_hash
-
+        
+        # We need to know the path to delete the file. 
+        # Assuming we can get it from the file relation or reconstruct it.
+        # For now, let's try to find it with extension or without.
+        # Ideally, we should fetch 'file' relation with 'path'.
+        
+        # Since we don't have the file object here easily without extra query (unless image.file is loaded),
+        # we will try to resolve path.
+        # But wait, image.file should be loaded if we use joinedload in repo.
+        
+        # Let's assume image.file is available or we query it.
+        # For simplicity in this fix, I will try to find the file on disk.
+        
         # Remove user link
         await self.repository.delete_image(image_id)
 
@@ -173,13 +188,22 @@ class MediaService:
             logger.info(f"MediaService | action=gc_start hash={file_hash}")
 
             await self.repository.delete_file(file_hash)
-
-            original_path = self._get_storage_path(file_hash)
+            
+            # Try to find file with extension
+            found = False
+            for ext in [""] + list(self.ALLOWED_MIME_TYPES.values()):
+                path = self._get_storage_path(file_hash, ext)
+                if path.exists():
+                    await self._remove_file(path)
+                    found = True
+            
             thumb_path = self._get_thumbnail_path(file_hash)
-
-            await self._remove_file(original_path)
             await self._remove_file(thumb_path)
-            logger.info(f"MediaService | action=gc_success hash={file_hash}")
+            
+            if found:
+                logger.info(f"MediaService | action=gc_success hash={file_hash}")
+            else:
+                logger.warning(f"MediaService | action=gc_warn reason=file_not_found_on_disk hash={file_hash}")
 
         await self.repository.commit()
         logger.info(f"MediaService | action=delete_success image_id={image_id} user_id={user_id}")
@@ -187,18 +211,25 @@ class MediaService:
     def get_original_file(self, file_hash: str) -> Path:
         """
         Get path to original file.
-        Raises NotFoundException if file does not exist.
+        Used for fallback serving via Python.
         """
+        # Try without extension first (legacy)
         path = self._get_storage_path(file_hash)
-        if not path.exists():
-            logger.warning(f"MediaService | action=get_file_failed reason=not_found hash={file_hash}")
-            raise NotFoundException(detail="File not found")
-        return path
+        if path.exists():
+            return path
+            
+        # Try with extensions
+        for ext in self.ALLOWED_MIME_TYPES.values():
+            path = self._get_storage_path(file_hash, ext)
+            if path.exists():
+                return path
+                
+        logger.warning(f"MediaService | action=get_file_failed reason=not_found hash={file_hash}")
+        raise NotFoundException(detail="File not found")
 
     def get_thumbnail_file(self, file_hash: str) -> Path:
         """
         Get path to thumbnail file.
-        Raises NotFoundException if file does not exist.
         """
         path = self._get_thumbnail_path(file_hash)
         if not path.exists():
@@ -254,27 +285,29 @@ class MediaService:
                 f"reason=invalid_mime mime={detected_mime}"
             )
             raise ValidationException(
-                detail=f"Invalid file type: {detected_mime}. Allowed: {', '.join(self.ALLOWED_MIME_TYPES)}"
+                detail=f"Invalid file type: {detected_mime}. Allowed: {', '.join(self.ALLOWED_MIME_TYPES.keys())}"
             )
 
         return detected_mime
 
-    def _get_storage_path(self, file_hash: str) -> Path:
+    def _get_storage_path(self, file_hash: str, ext: str = "") -> Path:
         """
-        Generate sharded path: root/storage/a1/b2/a1b2c3d4...
+        Generate sharded path: root/storage/a1/b2/a1b2c3d4...ext
         Creates directories if needed.
         """
         # Sharding: a1/b2
         shard = self.storage_dir / file_hash[:2] / file_hash[2:4]
         os.makedirs(shard, exist_ok=True)
-        return shard / file_hash
+        return shard / f"{file_hash}{ext}"
 
     def _get_thumbnail_path(self, file_hash: str) -> Path:
         """
         Generate path for thumbnail: root/storage/a1/b2/a1b2c3d4..._thumb.jpg
         """
-        original_path = self._get_storage_path(file_hash)
-        return original_path.parent / f"{file_hash}_thumb.jpg"
+        # Thumbnails are always jpg and stored alongside original
+        # We use _get_storage_path just to get the dir, but we construct filename manually
+        shard = self.storage_dir / file_hash[:2] / file_hash[2:4]
+        return shard / f"{file_hash}_thumb.jpg"
 
     async def _generate_thumbnail(self, original_path: Path, file_hash: str) -> None:
         """
