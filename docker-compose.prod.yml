@@ -21,30 +21,22 @@ services:
       - pinlite-network
 
   nginx:
-    image: nginx:alpine
+    # === ИЗМЕНЕНО: Используем кастомный образ ===
+    image: ${DOCKER_IMAGE_NGINX}
     container_name: pinlite-nginx
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      # === ИЗМЕНЕНО: Монтируем 2 файла ===
-      # Главный конфиг (events, http, upstream, rate limiting)
-      - ./nginx/nginx-main.conf:/etc/nginx/nginx.conf:ro
+      # === ИЗМЕНЕНО: Убрали монтирование конфигов и статики ===
+      # Они теперь внутри образа!
       
-      # Конфигурация сайта (server блоки HTTP + HTTPS)
-      - ./nginx/site.conf:/etc/nginx/conf.d/default.conf:ro
-      
-      # Frontend статика
-      - ./frontend:/usr/share/nginx/html:ro
-      
-      # Загруженные медиа-файлы
+      # Оставляем только динамические данные
       - uploads:/app/media:ro
       
-      # Certbot validation
-      - ./certbot/www:/var/www/certbot:ro
-      
-      # SSL сертификаты
+      # SSL и Certbot (это должно быть на хосте)
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
     depends_on:
       backend:
         condition: service_started

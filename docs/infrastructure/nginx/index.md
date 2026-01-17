@@ -4,9 +4,16 @@
 
 Мы используем Nginx как Reverse Proxy, Gateway и Web Server для статики.
 
-## 📂 Структура конфигурации
+## 🐳 Docker Image Strategy (New)
 
-В продакшене мы используем модульную структуру:
+PinLite использует отдельный Docker-образ для Nginx:
+- **Backend Image:** `ghcr.io/codexdlc/website_erste:latest`
+- **Nginx Image:** `ghcr.io/codexdlc/website_erste-nginx:latest`
+
+Конфигурационные файлы (`nginx-main.conf`, `site.conf`) и статика (`frontend/`) **встроены** в Nginx-образ.
+Это обеспечивает Immutable Infrastructure и упрощает деплой.
+
+## 📂 Структура конфигурации (Внутри образа)
 
 1.  **`nginx/nginx-main.conf`** -> `/etc/nginx/nginx.conf`
     *   Глобальные настройки (worker_connections, logs).
