@@ -30,12 +30,13 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install -e ".[dev]"
+        run: |
+          pip install -r requirements-dev.txt
+          pip install types-passlib types-python-jose
 
       - name: Run Pytest
         env:
           DATABASE_URL: postgresql+asyncpg://postgres:test_password@localhost:5432/test_db
-          # Добавляем фейковый ключ для тестов
           SECRET_KEY: "test_secret_key_for_ci_pipeline_only"
         run: pytest
 
