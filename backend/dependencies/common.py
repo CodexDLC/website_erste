@@ -1,4 +1,3 @@
-# backend/core/auth.py
 from dataclasses import dataclass
 from typing import Annotated
 
@@ -11,6 +10,11 @@ from backend.core.database import get_db
 
 @dataclass
 class APIContext:
+    """
+    Common API Context containing DB session and Settings.
+    Useful for passing shared dependencies to services.
+    """
+
     db: AsyncSession
     settings: Settings
 
@@ -18,6 +22,9 @@ class APIContext:
 async def get_context(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> APIContext:
+    """
+    Dependency provider for APIContext.
+    """
     return APIContext(
         db=db,
         settings=settings,

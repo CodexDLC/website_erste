@@ -3,6 +3,8 @@ from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 import pytest
+from sqlalchemy.exc import IntegrityError
+
 from backend.apps.users.contracts.token_repository import ITokenRepository
 from backend.apps.users.contracts.user_repository import IUserRepository
 from backend.apps.users.schemas.user import UserCreate
@@ -59,14 +61,22 @@ async def test_register_success(auth_service: AuthService, mock_user_repo: Async
 async def test_register_duplicate_email(auth_service: AuthService, mock_user_repo: AsyncMock) -> None:
     # Arrange
     user_in = UserCreate(email="exist@example.com", password="password123")
-    mock_user_repo.get_by_email.return_value = User(id=uuid4(), email="exist@example.com")
+    
+    # Simulate DB IntegrityError on create or commit
+    # Since the service calls create then commit, we can raise it on create for simplicity
+    # or on commit if create just adds to session. 
+    # In async SQLAlchemy, create usually just adds, commit flushes. 
+    # But let's look at the service: it calls create, then commit.
+    # We'll raise on create to be safe, or commit.
+    mock_user_repo.create.side_effect = IntegrityError(None, None, Exception("Duplicate"))
 
     # Act & Assert
     with pytest.raises(BusinessLogicException) as exc:
         await auth_service.register_user(user_in)
     
     assert "already exists" in str(exc.value)
-    mock_user_repo.create.assert_not_called()
+    # Verify create WAS called (attempted)
+    mock_user_repo.create.assert_called_once()
 
 @pytest.mark.asyncio
 async def test_authenticate_success(auth_service: AuthService, mock_user_repo: AsyncMock) -> None:

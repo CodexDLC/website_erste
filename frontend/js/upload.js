@@ -1,5 +1,11 @@
-// js/upload.js
-// Управляет загрузкой файлов (Drag & Drop, API Upload) и показом последних загрузок
+/**
+ * js/upload.js
+ * Handles File Upload logic (Drag & Drop).
+ * - Drag & Drop events
+ * - File validation
+ * - Upload API call
+ * - Recent uploads grid rendering
+ */
 
 // 1. STRICT AUTH CHECK
 if (!api.isLoggedIn()) {
@@ -23,14 +29,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnBack = document.getElementById("btn-back-gallery");
   const btnCopyViewer = document.getElementById("btn-copy-url-viewer");
 
-  // Инициализация: Загружаем галерею сразу
+  // Initial Load
   loadMyRecentGallery();
 
   // --- VIEWER LOGIC ---
   function openViewer(file) {
     if (!viewerBlock) return;
     viewerBlock.style.display = "block";
-    // Скрываем основной контент, чтобы не скроллился
     document.querySelector('.upload-wrapper').style.display = 'none';
 
     const fullUrl = api.getImageUrl(file.url);
@@ -83,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
     dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-over'), false);
   });
 
-  // --- ОБРАБОТКА ФАЙЛОВ ---
+  // --- FILE HANDLING ---
   dropZone.addEventListener('drop', (e) => {
     const dt = e.dataTransfer;
     const files = dt.files;
@@ -100,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- ЗАГРУЗКА НА СЕРВЕР ---
+  // --- UPLOAD LOGIC ---
   async function uploadFile(file) {
     if (!file.type.startsWith('image/')) {
         alert("Only images are allowed!");
@@ -116,13 +121,13 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
         const response = await api.uploadFile(file);
 
-        // Успех!
+        // Success
         const fullUrl = api.getImageUrl(response.url);
         resultLinkInput.value = fullUrl;
 
         dropText.textContent = "Upload successful! Select another file.";
 
-        // ОБНОВЛЯЕМ ГАЛЕРЕЮ СНИЗУ
+        // Refresh Gallery
         await loadMyRecentGallery();
 
     } catch (err) {
@@ -137,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- КОПИРОВАНИЕ ССЫЛКИ (Main Page) ---
+  // --- COPY LINK (Main Page) ---
   copyBtn.addEventListener("click", () => {
     const text = resultLinkInput.value;
     if (!text) return;
@@ -153,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // --- ЛОГИКА ГАЛЕРЕИ (GRID) ---
+  // --- GALLERY GRID LOGIC ---
   async function loadMyRecentGallery() {
       if (!gridContainer) return;
 
@@ -174,6 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
       }
 
+      // Smart Grid Layout Logic
       let sliceSizes = [];
       if (count === 3) sliceSizes = [2, 1];
       else if (count === 4) sliceSizes = [2, 2];
@@ -198,7 +204,6 @@ document.addEventListener("DOMContentLoaded", () => {
           const card = document.createElement("div");
           card.className = "gallery-card";
 
-          // FIX: Используем openViewer вместо window.open
           card.onclick = () => openViewer(file);
 
           const img = document.createElement("img");

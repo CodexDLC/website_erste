@@ -2,6 +2,7 @@ import secrets
 from datetime import UTC, datetime, timedelta
 
 from loguru import logger
+from sqlalchemy.exc import IntegrityError
 
 from backend.apps.users.contracts.token_repository import ITokenRepository
 from backend.apps.users.contracts.user_repository import IUserRepository
@@ -32,16 +33,18 @@ class AuthService:
         """
         logger.info(f"AuthService | action=register_attempt email={user_in.email}")
 
-        existing_user = await self.user_repository.get_by_email(str(user_in.email))
-        if existing_user:
-            logger.warning(f"AuthService | action=register_failed reason=email_exists email={user_in.email}")
-            raise BusinessLogicException(detail="User with this email already exists")
-
         hashed_password = get_password_hash(user_in.password)
         user_with_hash = user_in.model_copy(update={"password": hashed_password})
 
-        created_user = await self.user_repository.create(user_with_hash)
-        await self.user_repository.commit()
+        try:
+            created_user = await self.user_repository.create(user_with_hash)
+            await self.user_repository.commit()
+        except IntegrityError:
+            logger.warning(
+                f"AuthService | action=register_failed "
+                f"reason=email_exists_race_condition email={user_in.email}"
+            )
+            raise BusinessLogicException(detail="User with this email already exists") from None
 
         logger.info(f"AuthService | action=register_success user_id={created_user.id}")
 

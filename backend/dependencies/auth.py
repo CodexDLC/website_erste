@@ -4,6 +4,7 @@ from typing import Annotated, Any
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.apps.users.contracts.token_repository import ITokenRepository
@@ -54,30 +55,31 @@ async def get_current_user(
 ) -> User:
     """
     Dependency to get the current authenticated user from the JWT token.
-    Returns the SQLAlchemy User model instance.
+    Validates token signature and expiration.
     """
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
-        # payload.get("sub") returns Any | None. We need to handle None explicitly.
         user_id_raw: Any = payload.get("sub")
-        
+
         if user_id_raw is None:
+            logger.warning("AuthDependency | action=validate_failed reason=missing_sub")
             raise AuthException(detail="Could not validate credentials")
-            
+
         user_id_str = str(user_id_raw)
 
-        # Validate that sub is a valid UUID
         try:
             user_id = uuid.UUID(user_id_str)
-        except ValueError as e:
-            raise AuthException(detail="Invalid token subject") from e
+        except ValueError as exc:
+            logger.warning(f"AuthDependency | action=validate_failed reason=invalid_uuid sub={user_id_str}")
+            raise AuthException(detail="Invalid token subject") from exc
 
-    except JWTError as e:
-        raise AuthException(detail="Could not validate credentials") from e
+    except JWTError as exc:
+        logger.warning(f"AuthDependency | action=validate_failed reason=jwt_error error={exc}")
+        raise AuthException(detail="Could not validate credentials") from exc
 
-    # Fix: Use get_by_id instead of get_by_email
     user = await auth_service.user_repository.get_by_id(user_id=user_id)
     if user is None:
+        logger.warning(f"AuthDependency | action=user_lookup_failed reason=not_found user_id={user_id}")
         raise AuthException(detail="User not found")
 
     return user

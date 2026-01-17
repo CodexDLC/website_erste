@@ -1,4 +1,3 @@
-# backend/core/exceptions.py
 from typing import Any
 
 from fastapi import HTTPException, Request, status
@@ -6,6 +5,10 @@ from fastapi.responses import JSONResponse
 
 
 class BaseAPIException(HTTPException):
+    """
+    Base class for all API exceptions.
+    """
+
     def __init__(
         self,
         status_code: int,
@@ -20,7 +23,11 @@ class BaseAPIException(HTTPException):
 
 class NotFoundException(BaseAPIException):
     def __init__(self, detail: str = "Resource not found"):
-        super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail=detail, error_code="not_found")
+        super().__init__(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=detail,
+            error_code="not_found",
+        )
 
 
 class ValidationException(BaseAPIException):
@@ -61,8 +68,18 @@ class AuthException(BaseAPIException):
         )
 
 
-async def api_exception_handler(request: Request, exc: BaseAPIException) -> JSONResponse:
+async def api_exception_handler(_: Request, exc: BaseAPIException) -> JSONResponse:
+    """
+    Handler for custom BaseAPIException.
+    Returns structured JSON error response.
+    """
     return JSONResponse(
         status_code=exc.status_code,
-        content={"error": {"code": exc.error_code, "message": exc.detail, **exc.extra}},
+        content={
+            "error": {
+                "code": exc.error_code,
+                "message": exc.detail,
+                **exc.extra,
+            }
+        },
     )

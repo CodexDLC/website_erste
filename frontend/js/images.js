@@ -1,5 +1,11 @@
-// js/images.js
-// Управляет страницей "My Gallery" (Список файлов, Удаление)
+/**
+ * js/images.js
+ * Manages "My Gallery" page logic.
+ * - Loads user images
+ * - Renders list view
+ * - Handles Image Viewer (Modal)
+ * - Deletion logic
+ */
 
 // 1. STRICT AUTH CHECK
 if (!api.isLoggedIn()) {
@@ -18,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnBack = document.getElementById("btn-back-gallery");
     const btnCopyViewer = document.getElementById("btn-copy-url-viewer");
 
-    // Загружаем список
+    // Initial Load
     loadGalleryList();
 
     // --- VIEWER LOGIC ---
@@ -91,8 +97,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const iconDiv = document.createElement("div");
         iconDiv.className = "file-icon";
-        iconDiv.style.cursor = "pointer"; // Указываем, что кликабельно
-        iconDiv.onclick = () => openViewer(file); // Клик по иконке -> Вьювер
+        iconDiv.style.cursor = "pointer";
+        iconDiv.onclick = () => openViewer(file);
 
         const img = document.createElement("img");
         img.className = "thumbnail";
@@ -105,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
         nameSpan.style.overflow = "hidden";
         nameSpan.style.textOverflow = "ellipsis";
         nameSpan.style.cursor = "pointer";
-        nameSpan.onclick = () => openViewer(file); // Клик по имени -> Вьювер
+        nameSpan.onclick = () => openViewer(file);
 
         colName.appendChild(iconDiv);
         colName.appendChild(nameSpan);

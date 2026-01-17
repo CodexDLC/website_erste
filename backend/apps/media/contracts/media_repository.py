@@ -17,7 +17,7 @@ class IMediaRepository(Protocol):
         """
         ...
 
-    async def create_file(self, hash: str, size_bytes: int, mime_type: str, path: str) -> File:
+    async def create_file(self, file_hash: str, size_bytes: int, mime_type: str, path: str) -> File:
         """
         Register a new physical file in the database.
         """

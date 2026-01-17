@@ -3,6 +3,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field
 
+from backend.core.schemas.base import BaseRequest, BaseResponse
+
 
 class UserBase(BaseModel):
     """
@@ -13,7 +15,7 @@ class UserBase(BaseModel):
     email: EmailStr
 
 
-class UserCreate(UserBase):
+class UserCreate(UserBase, BaseRequest):
     """
     Schema for User registration.
     """
@@ -21,7 +23,7 @@ class UserCreate(UserBase):
     password: str = Field(..., min_length=8, description="User password")
 
 
-class UserUpdate(BaseModel):
+class UserUpdate(BaseRequest):
     """
     Schema for User update.
     """
@@ -31,7 +33,7 @@ class UserUpdate(BaseModel):
     is_active: bool | None = None
 
 
-class UserResponse(UserBase):
+class UserResponse(UserBase, BaseResponse):
     """
     Schema for User response (public data).
     """
@@ -40,6 +42,3 @@ class UserResponse(UserBase):
     is_active: bool
     is_superuser: bool
     created_at: datetime
-
-    class Config:
-        from_attributes = True
