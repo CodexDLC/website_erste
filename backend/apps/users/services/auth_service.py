@@ -2,6 +2,7 @@ import secrets
 from datetime import UTC, datetime, timedelta
 
 from loguru import logger
+from sqlalchemy.exc import IntegrityError
 
 from backend.apps.users.contracts.token_repository import ITokenRepository
 from backend.apps.users.contracts.user_repository import IUserRepository
@@ -32,16 +33,21 @@ class AuthService:
         """
         logger.info(f"AuthService | action=register_attempt email={user_in.email}")
 
-        existing_user = await self.user_repository.get_by_email(str(user_in.email))
-        if existing_user:
-            logger.warning(f"AuthService | action=register_failed reason=email_exists email={user_in.email}")
-            raise BusinessLogicException(detail="User with this email already exists")
-
+        # Хешируем пароль
         hashed_password = get_password_hash(user_in.password)
         user_with_hash = user_in.model_copy(update={"password": hashed_password})
 
-        created_user = await self.user_repository.create(user_with_hash)
-        await self.user_repository.commit()
+        try:
+            # Пытаемся создать пользователя.
+            # Если email уже занят (даже если мы прошли проверку выше в параллельном потоке),
+            # база данных выбросит IntegrityError (нарушение UNIQUE constraint).
+            created_user = await self.user_repository.create(user_with_hash)
+            await self.user_repository.commit()
+        except IntegrityError:
+            # Откатываем транзакцию (хотя в asyncpg это часто делается автоматически, но для надежности)
+            # В репозитории сессия может быть уже в состоянии ошибки.
+            logger.warning(f"AuthService | action=register_failed reason=email_exists_race_condition email={user_in.email}")
+            raise BusinessLogicException(detail="User with this email already exists")
 
         logger.info(f"AuthService | action=register_success user_id={created_user.id}")
 
