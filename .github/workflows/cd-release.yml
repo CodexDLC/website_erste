@@ -38,7 +38,7 @@ jobs:
           push: true
           tags: ghcr.io/${{ env.REPO_LOWER }}:latest
 
-      # === НОВОЕ: Build Nginx Image ===
+      # === Build Nginx Image ===
       - name: Build and Push Nginx Image
         uses: docker/build-push-action@v5
         with:
@@ -46,7 +46,16 @@ jobs:
           file: ./nginx/Dockerfile
           push: true
           tags: ghcr.io/${{ env.REPO_LOWER }}-nginx:latest
-      # =================================
+
+      # === Copy docker-compose to VPS ===
+      - name: Copy docker-compose to VPS
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "docker-compose.prod.yml"
+          target: "/opt/pinlite/"
 
       - name: SSH Deploy
         uses: appleboy/ssh-action@master
