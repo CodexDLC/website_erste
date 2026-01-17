@@ -80,7 +80,10 @@ class ApiClient {
                 return null;
             }
 
-            return await response.json();
+            // 6. Safe JSON parsing (handles 200 OK with empty body)
+            const text = await response.text();
+            return text ? JSON.parse(text) : null;
+
         } catch (err) {
             console.error(`API Error [${endpoint}]:`, err.message);
             throw err;
@@ -96,7 +99,10 @@ class ApiClient {
      */
     async _parseError(response) {
         try {
-            const data = await response.json();
+            const text = await response.text();
+            if (!text) return `Error ${response.status}`;
+
+            const data = JSON.parse(text);
 
             // Custom format (backend/core/exceptions.py)
             if (data.error && data.error.message) {
