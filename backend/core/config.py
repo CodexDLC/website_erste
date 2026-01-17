@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str
     DEBUG: bool = False
+    
+    # Domain settings for generating absolute URLs
+    SITE_URL: str = "http://localhost:8000"
 
     # --- Security ---
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
@@ -66,6 +69,13 @@ class Settings(BaseSettings):
             except json.JSONDecodeError:
                 return [v]
         return v
+    
+    @field_validator("SITE_URL")
+    def validate_site_url(cls, v: str) -> str:
+        """
+        Ensure SITE_URL does not end with a slash.
+        """
+        return v.rstrip("/")
 
 
 settings = Settings()
