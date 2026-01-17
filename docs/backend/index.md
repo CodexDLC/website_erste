@@ -18,7 +18,7 @@
 ```text
 backend/
  ┣ 📂 [core](./architecture/core/index.md)             # Инфраструктурный слой (Config, DB Connect, Logs)
- ┃ ┣ 📂 schemas                                        # Базовые Pydantic схемы (Error, Base)
+ ┃ ┣ 📂 schemas                                        # Базовые Pydantic схемы (BaseRequest, BaseResponse)
  ┃ ┃ ┣ 📜 base.py
  ┃ ┃ ┗ 📜 error.py
  ┃ ┣ 📜 config.py
@@ -51,8 +51,9 @@ backend/
 ### Infrastructure & Storage
 ```text
 root/
- ┣ 📂 [nginx](../nginx/index.md)              # Конфигурация прокси
- ┃ ┗ 📜 nginx.conf
+ ┣ 📂 [nginx](../infrastructure/nginx/index.md) # Конфигурация прокси
+ ┃ ┣ 📜 nginx-main.conf
+ ┃ ┗ 📜 site.conf
  ┃
  ┗ 📂 data              # Persistent Storage (Volumes)
    ┣ 📂 uploads         # Здесь физически лежат картинки (cat.png, dog.png)
