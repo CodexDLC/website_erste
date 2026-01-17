@@ -12,15 +12,15 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.pool import NullPool
 
 # --- TEST DATABASE CONFIG ---
-# Читаем из ENV (для CI), иначе используем дефолт (для локального запуска)
-# В CI мы передаем DATABASE_URL=postgresql+asyncpg://postgres:test_password@localhost:5432/test_db
+# Read from ENV (for CI), otherwise use default (for local run)
+# In CI we pass DATABASE_URL=postgresql+asyncpg://postgres:test_password@localhost:5432/test_db
 DEFAULT_TEST_DB_URL = "postgresql+asyncpg://postgres:postgres@localhost:5433/test_db"
 TEST_DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_TEST_DB_URL)
 
-# Создаем отдельный engine для тестов
+# Create separate engine for tests
 test_engine = create_async_engine(
     TEST_DATABASE_URL,
-    poolclass=NullPool,  # Важно для тестов, чтобы закрывать соединения сразу
+    poolclass=NullPool,  # Important for tests to close connections immediately
 )
 
 TestingSessionLocal = async_sessionmaker(
@@ -30,6 +30,7 @@ TestingSessionLocal = async_sessionmaker(
     autoflush=False,
 )
 
+
 @pytest.fixture(scope="session")
 def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
     """Create an instance of the default event loop for each test case."""
@@ -37,11 +38,12 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
     yield loop
     loop.close()
 
+
 @pytest_asyncio.fixture(scope="function")
 async def db_session() -> AsyncGenerator[AsyncSession, None]:
     """
-    Фикстура базы данных.
-    Создает таблицы перед тестом и удаляет после.
+    Database fixture.
+    Creates tables before test and drops them after.
     """
     # Create tables
     async with test_engine.begin() as conn:
@@ -57,20 +59,21 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
+
 @pytest_asyncio.fixture(scope="function")
 async def async_client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     """
-    Фикстура HTTP клиента для интеграционных тестов.
-    Переопределяет зависимость get_db на тестовую сессию.
+    HTTP Client fixture for integration tests.
+    Overrides get_db dependency with test session.
     """
     async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
         yield db_session
 
     app.dependency_overrides[get_db] = override_get_db
-    
-    # Используем ASGITransport для прямого вызова приложения без сетевых запросов
+
+    # Use ASGITransport for direct app calls without network requests
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client
-    
+
     app.dependency_overrides.clear()

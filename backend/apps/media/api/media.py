@@ -3,10 +3,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, File, Query, UploadFile, status
 from fastapi import Path as PathParam
 from fastapi.responses import FileResponse
+from loguru import logger
 
 from backend.apps.media.schemas.media import ImageRead
 from backend.apps.media.services.media_service import MediaService
-from backend.core.exceptions import NotFoundException
 from backend.database.models import User
 from backend.dependencies.auth import get_current_user
 from backend.dependencies.media import get_media_service
@@ -22,7 +22,14 @@ async def upload_file(
 ) -> ImageRead:
     """
     Upload a new image.
+
+    Returns:
+        ImageRead: Uploaded image metadata.
     """
+    logger.info(
+        f"MediaRouter | action=upload_request "
+        f"user_id={current_user.id} filename={file.filename}"
+    )
     return await service.upload_image(user_id=current_user.id, file=file)
 
 
@@ -34,7 +41,11 @@ async def get_feed(
 ) -> list[ImageRead]:
     """
     Get public feed of images.
+
+    Returns:
+        list[ImageRead]: List of public images.
     """
+    logger.info(f"MediaRouter | action=feed_request limit={limit} offset={offset}")
     return await service.get_feed(limit=limit, offset=offset)
 
 
@@ -47,7 +58,14 @@ async def get_my_gallery(
 ) -> list[ImageRead]:
     """
     Get current user's gallery.
+
+    Returns:
+        list[ImageRead]: List of user's images.
     """
+    logger.info(
+        f"MediaRouter | action=my_gallery_request "
+        f"user_id={current_user.id} limit={limit} offset={offset}"
+    )
     return await service.get_user_gallery(user_id=current_user.id, limit=limit, offset=offset)
 
 
@@ -60,6 +78,7 @@ async def delete_image(
     """
     Delete an image.
     """
+    logger.info(f"MediaRouter | action=delete_request user_id={current_user.id} image_id={image_id}")
     await service.delete_image(user_id=current_user.id, image_id=image_id)
 
 
@@ -74,12 +93,9 @@ async def get_file(
     """
     Serve original file by hash.
     """
-    # Access private method to resolve path (pragmatic choice for serving)
-    # In production, Nginx should handle this mapping.
-    path = service._get_storage_path(file_hash)
-    if not path.exists():
-        raise NotFoundException(detail="File not found")
-
+    # Use public service method to resolve path
+    path = service.get_original_file(file_hash)
+    logger.debug(f"MediaRouter | action=serve_file hash={file_hash}")
     return FileResponse(path)
 
 
@@ -91,10 +107,7 @@ async def get_thumbnail(
     """
     Serve thumbnail by hash.
     """
-    path = service._get_thumbnail_path(file_hash)
-    if not path.exists():
-        # Fallback to original if thumb missing (or 404)
-        # Let's return 404 to be strict
-        raise NotFoundException(detail="Thumbnail not found")
-
+    # Use public service method to resolve path
+    path = service.get_thumbnail_file(file_hash)
+    logger.debug(f"MediaRouter | action=serve_thumb hash={file_hash}")
     return FileResponse(path)

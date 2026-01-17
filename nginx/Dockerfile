@@ -1,18 +1,21 @@
-# Базовый образ Nginx Alpine (легковесный)
+# Base Image: Nginx Alpine (Lightweight)
 FROM nginx:alpine
 
-# Если context = . (корень репозитория):
+# Copy Main Configuration
+# Assumes build context is the repository root
 COPY nginx/nginx-main.conf /etc/nginx/nginx.conf
+
+# Copy Site Configuration (Server Block)
 COPY nginx/site.conf /etc/nginx/conf.d/default.conf
 
-# Копируем статику Frontend
+# Copy Frontend Static Files
 COPY frontend /usr/share/nginx/html
 
-# Создаём директории для Certbot (чтобы Nginx не ругался при старте)
+# Create Certbot directory (prevents startup errors if volume is missing)
 RUN mkdir -p /var/www/certbot
 
-# Открываем порты
+# Expose HTTP and HTTPS ports
 EXPOSE 80 443
 
-# Запуск Nginx
+# Start Nginx in foreground
 CMD ["nginx", "-g", "daemon off;"]

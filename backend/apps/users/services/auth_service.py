@@ -33,21 +33,18 @@ class AuthService:
         """
         logger.info(f"AuthService | action=register_attempt email={user_in.email}")
 
-        # Хешируем пароль
         hashed_password = get_password_hash(user_in.password)
         user_with_hash = user_in.model_copy(update={"password": hashed_password})
 
         try:
-            # Пытаемся создать пользователя.
-            # Если email уже занят (даже если мы прошли проверку выше в параллельном потоке),
-            # база данных выбросит IntegrityError (нарушение UNIQUE constraint).
             created_user = await self.user_repository.create(user_with_hash)
             await self.user_repository.commit()
         except IntegrityError:
-            # Откатываем транзакцию (хотя в asyncpg это часто делается автоматически, но для надежности)
-            # В репозитории сессия может быть уже в состоянии ошибки.
-            logger.warning(f"AuthService | action=register_failed reason=email_exists_race_condition email={user_in.email}")
-            raise BusinessLogicException(detail="User with this email already exists")
+            logger.warning(
+                f"AuthService | action=register_failed "
+                f"reason=email_exists_race_condition email={user_in.email}"
+            )
+            raise BusinessLogicException(detail="User with this email already exists") from None
 
         logger.info(f"AuthService | action=register_success user_id={created_user.id}")
 

@@ -17,6 +17,9 @@ async def register_new_user(
 ) -> UserResponse:
     """
     Register a new user.
+
+    Returns:
+        UserResponse: Created user data.
     """
     logger.info(f"AuthRouter | action=register_request email={user_in.email}")
     return await auth_service.register_user(user_in)
@@ -28,15 +31,23 @@ async def login_for_access_token(
     auth_service: AuthService = Depends(get_auth_service),
 ) -> Token:
     """
-    OAuth2 compatible token login.
+    Authenticate user (OAuth2 Password Flow).
+
+    Returns:
+        Token: Access and refresh token pair.
     """
     logger.info(f"AuthRouter | action=login_request email={form_data.username}")
 
     user = await auth_service.authenticate_user(form_data.username, form_data.password)
     if not user:
+        logger.warning(
+            f"AuthRouter | action=login_failed "
+            f"reason=invalid_credentials email={form_data.username}"
+        )
         raise AuthException(detail="Incorrect email or password")
 
     tokens = await auth_service.create_tokens(user)
+    logger.info(f"AuthRouter | action=login_success user_id={user.id}")
 
     return tokens
 
@@ -46,7 +57,10 @@ async def refresh_token(
     token_in: RefreshTokenRequest, auth_service: AuthService = Depends(get_auth_service)
 ) -> Token:
     """
-    Get new access/refresh tokens.
+    Refresh access token using refresh token.
+
+    Returns:
+        Token: New token pair.
     """
     logger.info("AuthRouter | action=refresh_request")
     return await auth_service.refresh_token(token_in.refresh_token)
@@ -57,7 +71,7 @@ async def logout(
     token_in: RefreshTokenRequest, auth_service: AuthService = Depends(get_auth_service)
 ) -> Response:
     """
-    Logout user.
+    Logout user (invalidate refresh token).
     """
     logger.info("AuthRouter | action=logout_request")
     await auth_service.logout(token_in.refresh_token)

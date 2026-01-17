@@ -1,7 +1,9 @@
 from pydantic import BaseModel
 
+from backend.core.schemas.base import BaseRequest, BaseResponse
 
-class Token(BaseModel):
+
+class Token(BaseResponse):
     """
     Schema for JWT Token response.
     """
@@ -14,13 +16,14 @@ class Token(BaseModel):
 class TokenPayload(BaseModel):
     """
     Schema for JWT Token payload.
+    Internal use only, no need for BaseRequest/Response.
     """
 
     sub: str | None = None
     exp: int | None = None
 
 
-class RefreshTokenRequest(BaseModel):
+class RefreshTokenRequest(BaseRequest):
     """
     Schema for Refresh Token request.
     """

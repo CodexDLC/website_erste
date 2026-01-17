@@ -1,11 +1,11 @@
-# backend/database/models/base.py
 from datetime import datetime
 
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.sql import func
 
-# Соглашение об именовании индексов (важно для Alembic)
+# Naming convention for Alembic migrations
+# Ensures consistent naming for indexes and constraints
 convention = {
     "ix": "ix_%(column_0_label)s",
     "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -16,16 +16,21 @@ convention = {
 
 
 class Base(DeclarativeBase):
-    """Главный класс, от которого наследуются все таблицы."""
+    """
+    Base class for all SQLAlchemy models.
+    Includes metadata with naming convention.
+    """
 
     metadata = MetaData(naming_convention=convention)
 
 
 class TimestampMixin:
     """
-    Миксин для добавления полей created_at и updated_at.
-    Использование: class User(Base, TimestampMixin): ...
+    Mixin to add created_at and updated_at columns.
+    Usage: class User(Base, TimestampMixin): ...
     """
 
     created_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(), onupdate=func.now(), nullable=False
+    )

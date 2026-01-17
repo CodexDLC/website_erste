@@ -1,10 +1,12 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, computed_field
+from pydantic import computed_field
+
+from backend.core.schemas.base import BaseResponse
 
 
-class FileRead(BaseModel):
+class FileRead(BaseResponse):
     """
     Schema for reading File metadata (CAS).
     """
@@ -14,10 +16,8 @@ class FileRead(BaseModel):
     mime_type: str
     created_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
 
-
-class ImageRead(BaseModel):
+class ImageRead(BaseResponse):
     """
     Schema for reading Image metadata (User Asset).
     """
@@ -25,10 +25,7 @@ class ImageRead(BaseModel):
     id: UUID
     filename: str
     created_at: datetime
-    # We might want to include file details here
     file: FileRead
-
-    model_config = ConfigDict(from_attributes=True)
 
     @computed_field
     def url(self) -> str:

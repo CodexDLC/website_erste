@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     BigInteger,
@@ -9,10 +10,13 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from .base import Base
+
+if TYPE_CHECKING:
+    from .media import Image
 
 
 class User(Base):
@@ -33,10 +37,15 @@ class User(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
 
     # Relationships
-    # TODO: Uncomment after full refactoring and resolving circular imports
-    # refresh_tokens = relationship("RefreshToken", back_populates="user", cascade="all, delete-orphan")
-    # social_accounts = relationship("SocialAccount", back_populates="user", cascade="all, delete-orphan")
-    # images = relationship("Image", back_populates="user", cascade="all, delete-orphan")
+    refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
+        "RefreshToken", back_populates="user", cascade="all, delete-orphan"
+    )
+    social_accounts: Mapped[list["SocialAccount"]] = relationship(
+        "SocialAccount", back_populates="user", cascade="all, delete-orphan"
+    )
+    images: Mapped[list["Image"]] = relationship(
+        "Image", back_populates="user", cascade="all, delete-orphan"
+    )
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, email={self.email})>"
@@ -62,8 +71,7 @@ class SocialAccount(Base):
     __table_args__ = (UniqueConstraint("provider", "provider_id", name="uix_social_account_provider_pid"),)
 
     # Relationships
-    # TODO: Uncomment after full refactoring
-    # user = relationship("User", back_populates="social_accounts")
+    user: Mapped["User"] = relationship("User", back_populates="social_accounts")
 
     def __repr__(self) -> str:
         return f"<SocialAccount(provider={self.provider}, user_id={self.user_id})>"
@@ -84,8 +92,7 @@ class RefreshToken(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
-    # TODO: Uncomment after full refactoring
-    # user = relationship("User", back_populates="refresh_tokens")
+    user: Mapped["User"] = relationship("User", back_populates="refresh_tokens")
 
     def __repr__(self) -> str:
         return f"<RefreshToken(id={self.id}, user_id={self.user_id})>"

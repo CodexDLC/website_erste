@@ -34,8 +34,7 @@ class UserRepository:
     async def create(self, user_in: UserCreate) -> User:
         """
         Create a new user in the database.
-        WARNING: Assumes user_in.password holds the HASHED password.
-        The Service layer is responsible for hashing before calling this.
+        Note: user_in.password must be already HASHED by the service layer.
         """
         db_user = User(
             email=user_in.email,

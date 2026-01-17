@@ -25,8 +25,7 @@ def media_service(mock_media_repo: AsyncMock) -> MediaService:
         mock_settings.UPLOAD_DIR = Path("/tmp/test_uploads")
         
         service = MediaService(mock_media_repo)
-        # Override dirs to avoid real FS creation in init (though init is already called)
-        # Better to mock Path.mkdir in init, but here we just redirect
+        # Override dirs to avoid real FS creation in init
         service.temp_dir = MagicMock()
         service.storage_dir = MagicMock()
         return service
@@ -35,6 +34,10 @@ def media_service(mock_media_repo: AsyncMock) -> MediaService:
 
 @pytest.mark.asyncio
 async def test_upload_image_new_file(media_service: MediaService, mock_media_repo: AsyncMock) -> None:
+    """
+    Test uploading a new file (Deduplication MISS).
+    Should create File and Image records and move file to storage.
+    """
     # Arrange
     user_id = uuid4()
     file_mock = AsyncMock()
@@ -51,7 +54,6 @@ async def test_upload_image_new_file(media_service: MediaService, mock_media_rep
     # Mock repo behavior (Deduplication MISS)
     mock_media_repo.get_file_by_hash.return_value = None
     
-    # FIX: Use real Image object with nested File object for Pydantic validation
     mock_file = File(
         hash="hash123",
         size_bytes=100,
@@ -65,7 +67,7 @@ async def test_upload_image_new_file(media_service: MediaService, mock_media_rep
         file_hash="hash123",
         filename="cat.jpg",
         created_at=datetime.now(UTC),
-        file=mock_file # Relationship
+        file=mock_file
     )
     mock_media_repo.create_image.return_value = mock_image
 
@@ -75,7 +77,6 @@ async def test_upload_image_new_file(media_service: MediaService, mock_media_rep
         result = await media_service.upload_image(user_id, file_mock)
 
     # Assert
-    # FIX: Access nested file hash
     assert result.file.hash == "hash123"
     mock_move.assert_called_once() # Should move file
     mock_media_repo.create_file.assert_called_once()
@@ -83,6 +84,10 @@ async def test_upload_image_new_file(media_service: MediaService, mock_media_rep
 
 @pytest.mark.asyncio
 async def test_upload_image_deduplication_hit(media_service: MediaService, mock_media_repo: AsyncMock) -> None:
+    """
+    Test uploading an existing file (Deduplication HIT).
+    Should NOT create File record, only Image record.
+    """
     # Arrange
     user_id = uuid4()
     file_mock = AsyncMock()
@@ -117,7 +122,6 @@ async def test_upload_image_deduplication_hit(media_service: MediaService, mock_
         result = await media_service.upload_image(user_id, file_mock)
 
     # Assert
-    # FIX: Access nested file hash
     assert result.file.hash == "hash123"
     mock_move.assert_not_called() # Should NOT move file
     mock_media_repo.create_file.assert_not_called() # Should NOT create new file record
@@ -126,6 +130,10 @@ async def test_upload_image_deduplication_hit(media_service: MediaService, mock_
 
 @pytest.mark.asyncio
 async def test_delete_image_owner_success(media_service: MediaService, mock_media_repo: AsyncMock) -> None:
+    """
+    Test deleting image by owner.
+    GC should NOT trigger if file is used by others.
+    """
     # Arrange
     user_id = uuid4()
     image_id = uuid4()
@@ -147,6 +155,9 @@ async def test_delete_image_owner_success(media_service: MediaService, mock_medi
 
 @pytest.mark.asyncio
 async def test_delete_image_gc_trigger(media_service: MediaService, mock_media_repo: AsyncMock) -> None:
+    """
+    Test deleting image triggering Garbage Collection.
+    """
     # Arrange
     user_id = uuid4()
     image_id = uuid4()
@@ -173,6 +184,9 @@ async def test_delete_image_gc_trigger(media_service: MediaService, mock_media_r
 
 @pytest.mark.asyncio
 async def test_delete_image_not_owner(media_service: MediaService, mock_media_repo: AsyncMock) -> None:
+    """
+    Test deleting image by non-owner (Permission Denied).
+    """
     # Arrange
     user_id = uuid4()
     other_user_id = uuid4()

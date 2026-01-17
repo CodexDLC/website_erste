@@ -1,4 +1,3 @@
-# backend/core/config.py
 import json
 from pathlib import Path
 from typing import Any
@@ -6,34 +5,40 @@ from typing import Any
 from pydantic import computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Определяем корень проекта
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 class Settings(BaseSettings):
-    # Явно указываем полный путь к .env файлу
+    """
+    Application Configuration.
+    Loads settings from environment variables (.env file).
+    """
+
     model_config = SettingsConfigDict(
-        env_file=BASE_DIR / ".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore"
+        env_file=BASE_DIR / ".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
     )
 
-    # === Main ===
+    # --- Main ---
     PROJECT_NAME: str = "PinLite"
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str
     DEBUG: bool = False
 
-    # === Security ===
+    # --- Security ---
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
 
-    # === Database ===
+    # --- Database ---
     DATABASE_URL: str
 
-    # === Storage ===
+    # --- Storage ---
     UPLOAD_DIR: Path = BASE_DIR / "data" / "uploads"
     MAX_UPLOAD_SIZE: int = 5 * 1024 * 1024  # 5 MB
 
-    # === Logging ===
+    # --- Logging ---
     LOG_LEVEL_CONSOLE: str = "INFO"
     LOG_LEVEL_FILE: str = "DEBUG"
     LOG_ROTATION: str = "10 MB"
@@ -47,22 +52,24 @@ class Settings(BaseSettings):
     def log_file_errors(self) -> Path:
         return self.LOG_DIR / "errors.json"
 
-    # === CORS ===
-    # DEV HACK: Разрешаем всем (перезаписывает значение из .env, если там другое)
+    # --- CORS ---
     ALLOWED_ORIGINS: str | list[str] = '["*"]'
 
     @field_validator("ALLOWED_ORIGINS", mode="before")
-    @classmethod
     def parse_origins(cls, v: Any) -> Any:
+        """
+        Parses a JSON string of origins into a list.
+        """
         if isinstance(v, str):
             try:
                 return json.loads(v)
             except json.JSONDecodeError:
-                return [v]  # Если одна строка без JSON
+                return [v]
         return v
 
 
 settings = Settings()
 
+# Ensure critical directories exist
 settings.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 settings.LOG_DIR.mkdir(parents=True, exist_ok=True)

@@ -1,11 +1,15 @@
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from .base import Base
+
+if TYPE_CHECKING:
+    from .users import User
 
 
 class File(Base):
@@ -32,7 +36,7 @@ class File(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
-    images = relationship("Image", back_populates="file")
+    images: Mapped[list["Image"]] = relationship("Image", back_populates="file")
 
     def __repr__(self) -> str:
         return f"<File(hash={self.hash[:8]}..., mime={self.mime_type}, refs={self.ref_count})>"
@@ -59,10 +63,8 @@ class Image(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
-    file = relationship("File", back_populates="images")
-
-    # TODO: Uncomment after resolving circular imports
-    # user = relationship("User", back_populates="images")
+    file: Mapped["File"] = relationship("File", back_populates="images")
+    user: Mapped["User"] = relationship("User", back_populates="images")
 
     def __repr__(self) -> str:
         return f"<Image(id={self.id}, filename={self.filename})>"
