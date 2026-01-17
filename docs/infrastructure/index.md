@@ -2,15 +2,16 @@
 
 # 🏗️ Infrastructure & DevOps
 
-Документация по инфраструктуре проекта, контейнеризации и базам данных.
+Документация по развертыванию, серверам и CI/CD.
 
 ## 📑 Содержание
 
-*   **[🏃 Runbook (Запуск)](./runbook.md)** — Инструкции по запуску, остановке и отладке.
-*   **[📦 Containers](./containers.md)** — Описание Docker-контейнеров (Backend, Nginx, etc).
-*   **[🗄️ Database](./database.md)** — Конфигурация базы данных (Neon PostgreSQL).
-*   **[🚀 Deployment](./deployment.md)** — Стратегия деплоя.
-*   **[🌐 Nginx](../nginx/index.md)** — (Планируется к переносу сюда) Конфигурация веб-сервера.
+*   **[🏃 Runbook](./runbook.md)** — Как запустить проект локально или в Docker.
+*   **[⚙️ Setup CI/CD](./setup_ci_cd.md)** — **Как настроить деплой на свой сервер (Secrets, VPS).**
+*   **[🚀 Deployment Strategy](./deployment.md)** — Общая стратегия (Docker Compose, Nginx).
+*   **[📦 Containers](./containers.md)** — Описание Docker-образов.
+*   **[🗄️ Database](./database.md)** — Работа с БД (миграции, бэкапы).
+*   **[🌐 Nginx](./nginx/index.md)** — Настройка веб-сервера.
 
 ---
 [🏠 Вернуться на главную](../index.md)
