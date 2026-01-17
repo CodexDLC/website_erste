@@ -11,6 +11,7 @@ services:
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
       - LOG_LEVEL_CONSOLE=WARNING
       - LOG_LEVEL_FILE=INFO
+      - SITE_URL=${SITE_URL}
     volumes:
       - uploads:/app/data/uploads
       - logs:/app/data/logs
