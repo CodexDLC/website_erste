@@ -12,12 +12,13 @@
 ## 🛠️ Infrastructure & DevOps (Phase 5)
 *   [x] **[Migrate Nginx to Docker Image](./nginx_docker_migration.md)** — Упаковка конфигов в образ.
 *   [ ] **[Backend Optimization](./backend_optimization.md)** — DB Pool, Logging, Async Thumbnails.
+*   [ ] **[Monitoring Setup](./monitoring_setup.md)** — UptimeRobot, Sentry.
 
 ## 🎨 Frontend & UX
 *   [ ] **[Frontend UX Improvements](./frontend_ux_improvements.md)** — Loading States, Pagination, A11y.
 
 ## 🛡️ Security & Privacy
-*   [ ] **[Privacy & Security Hardening](./privacy_security.md)** — CORS, EXIF Stripping, Content Moderation.
+*   [ ] **[Privacy & Security Hardening](./privacy_security.md)** — CORS, CSP, EXIF Stripping.
 *   [ ] [Secure Auth Storage (HttpOnly Cookies)](./auth_cookies.md) — Переезд с localStorage на Cookies.
 
 ## 📋 Backlog (Tech Debt)
