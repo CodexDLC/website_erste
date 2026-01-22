@@ -3,14 +3,13 @@ from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 import pytest
-from sqlalchemy.exc import IntegrityError
-
 from backend.apps.users.contracts.token_repository import ITokenRepository
 from backend.apps.users.contracts.user_repository import IUserRepository
 from backend.apps.users.schemas.user import UserCreate
 from backend.apps.users.services.auth_service import AuthService
 from backend.core.exceptions import AuthException, BusinessLogicException
 from backend.database.models.users import User
+from sqlalchemy.exc import IntegrityError
 
 # --- Mocks ---
 

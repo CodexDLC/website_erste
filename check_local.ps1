@@ -1,10 +1,11 @@
 $ErrorActionPreference = "Stop"
 Write-Host "🚀 Starting Local Quality Check..." -ForegroundColor Cyan
 
-# 1. Backend: Ruff
-Write-Host "`n🔍 Checking Backend Style (Ruff)..." -ForegroundColor Yellow
+# 1. Backend & Tests: Ruff
+Write-Host "`n🔍 Checking Style (Ruff)..." -ForegroundColor Yellow
 try {
-    ruff check backend/ --fix
+    # Проверяем и backend, и tests
+    ruff check backend/ tests/ --fix
     if ($LASTEXITCODE -ne 0) { throw "Ruff found errors" }
     Write-Host "✅ Ruff passed!" -ForegroundColor Green
 } catch {
