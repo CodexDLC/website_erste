@@ -15,6 +15,8 @@ services:
     volumes:
       - uploads:/app/data/uploads
       - logs:/app/data/logs
+      - ./backend/alembic:/app/alembic
+      - ./backend/alembic.ini:/app/alembic.ini
     expose:
       - "8000"
     restart: always
@@ -29,15 +31,10 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      # === ИЗМЕНЕНО: Убрали монтирование конфигов и статики ===
-      # Они теперь внутри образа!
-      
-      # Оставляем только динамические данные
+      - ./nginx/nginx-main.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/site.conf:/etc/nginx/conf.d/site.conf:ro
+      - ./frontend:/usr/share/nginx/html:ro
       - uploads:/app/media:ro
-      
-      # SSL и Certbot (это должно быть на хосте)
-      - /etc/letsencrypt:/etc/letsencrypt:ro
-      - ./certbot/www:/var/www/certbot:ro
     depends_on:
       backend:
         condition: service_started

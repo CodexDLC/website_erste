@@ -14,6 +14,9 @@ services:
       - LOG_ROTATION=${LOG_ROTATION:-10MB}
       - SITE_URL=${SITE_URL}
     volumes:
+      - ./backend:/app/backend:ro
+      - ./backend/alembic:/app/alembic
+      - ./backend/alembic.ini:/app/alembic.ini
       - uploads:/app/data/uploads
       - logs:/app/data/logs
     expose:
@@ -34,7 +37,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx-main.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/site-local.conf:/etc/nginx/conf.d/site.conf:ro
       - ./frontend:/usr/share/nginx/html:ro
       - uploads:/app/media:ro
     depends_on:

@@ -45,6 +45,7 @@
 - [x] **Refactoring:** Глобальный аудит кода, внедрение Clean Architecture, Observability (Logs).
 - [x] **Documentation:** Обновление README, JSDoc, Docstrings.
 - [x] **Infrastructure:** Оптимизация Nginx и Docker.
+- [x] **Database Migrations:** Настройка Alembic, автоматические миграции (AUTO_MIGRATE), интеграция в CI/CD.
 
 ## 🔮 Phase 6: Future Plans (v2.0)
 Планирование следующей версии.

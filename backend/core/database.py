@@ -76,3 +76,43 @@ async def create_db_tables() -> None:
         logger.info("Database | action=create_tables status=success")
     except SQLAlchemyError as db_exc:
         logger.error(f"Database | action=create_tables status=failed error={db_exc}")
+
+
+async def run_alembic_migrations() -> None:
+    """
+    Run Alembic migrations programmatically using Alembic API.
+    """
+    import asyncio
+    from pathlib import Path
+
+    from alembic.config import Config
+
+    from alembic import command
+
+    def _run_sync_migrations() -> None:
+        """Synchronous wrapper for Alembic command (runs in thread pool)"""
+        try:
+            # Путь к alembic.ini
+            alembic_cfg_path = Path(__file__).parent.parent / "alembic.ini"
+
+            if not alembic_cfg_path.exists():
+                logger.warning("Database | action=run_migrations status=skipped reason=alembic_ini_not_found")
+                return
+
+            # Создаем конфиг Alembic
+            alembic_cfg = Config(str(alembic_cfg_path))
+
+            # Запускаем миграции (синхронно)
+            command.upgrade(alembic_cfg, "head")
+
+            logger.info("Database | action=run_migrations status=success")
+
+        except Exception as exc:
+            logger.error(f"Database | action=run_migrations status=failed error={exc}")
+            raise
+
+    # Запускаем синхронную функцию в thread pool
+    await asyncio.to_thread(_run_sync_migrations)
+
+# Explicitly export Base for mypy
+__all__ = ["Base", "get_db", "create_db_tables", "run_alembic_migrations", "async_engine"]

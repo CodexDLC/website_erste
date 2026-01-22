@@ -30,12 +30,15 @@ class Settings(BaseSettings):
     # Domain settings for generating absolute URLs
     SITE_URL: str = "http://localhost:8000"
 
+
+
     # --- Security ---
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
 
     # --- Database ---
     DATABASE_URL: str
+    AUTO_MIGRATE: bool = True
 
     # --- Storage ---
     UPLOAD_DIR: Path = BASE_DIR / "data" / "uploads"
