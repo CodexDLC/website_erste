@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from loguru import logger
 
 from .core.config import settings
-from .core.database import async_engine, create_db_tables
+from .core.database import async_engine, run_alembic_migrations
 from .core.exceptions import BaseAPIException, api_exception_handler
 from .core.logger import setup_loguru
 from .core.schemas.error import ErrorResponse
@@ -26,8 +26,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     else:
         logger.info("🔒 Production mode: Swagger UI is DISABLED")
 
-    logger.info("Connecting to Database and creating tables...")
-    await create_db_tables()
+    if settings.AUTO_MIGRATE:
+        logger.info("Running database migrations (AUTO_MIGRATE=True)...")
+        await run_alembic_migrations()
+    else:
+        logger.warning("⚠️ AUTO_MIGRATE=False: Skipping migrations. Run 'alembic upgrade head' manually.")
 
     yield
 
