@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from ..database.models.base import Base
-from .config import settings
+from .config import BASE_DIR, settings
 
 # --- Connection Configuration ---
 
@@ -83,7 +83,6 @@ async def run_alembic_migrations() -> None:
     Run Alembic migrations programmatically using Alembic API.
     """
     import asyncio
-    from pathlib import Path
 
     from alembic.config import Config
 
@@ -92,17 +91,17 @@ async def run_alembic_migrations() -> None:
     def _run_sync_migrations() -> None:
         """Synchronous wrapper for Alembic command (runs in thread pool)"""
         try:
-            # Путь к alembic.ini
-            alembic_cfg_path = Path(__file__).parent.parent / "alembic.ini"
+            # Path to alembic.ini using BASE_DIR for reliability
+            alembic_cfg_path = BASE_DIR / "backend" / "alembic.ini"
 
             if not alembic_cfg_path.exists():
                 logger.warning("Database | action=run_migrations status=skipped reason=alembic_ini_not_found")
                 return
 
-            # Создаем конфиг Alembic
+            # Create Alembic config
             alembic_cfg = Config(str(alembic_cfg_path))
 
-            # Запускаем миграции (синхронно)
+            # Run migrations (synchronously)
             command.upgrade(alembic_cfg, "head")
 
             logger.info("Database | action=run_migrations status=success")
@@ -111,7 +110,7 @@ async def run_alembic_migrations() -> None:
             logger.error(f"Database | action=run_migrations status=failed error={exc}")
             raise
 
-    # Запускаем синхронную функцию в thread pool
+    # Run synchronous function in thread pool
     await asyncio.to_thread(_run_sync_migrations)
 
 # Explicitly export Base for mypy

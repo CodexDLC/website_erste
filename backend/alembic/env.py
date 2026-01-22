@@ -2,10 +2,10 @@
 import asyncio
 from logging.config import fileConfig
 
-# ✨ Импортируем все модели через models/__init__.py
+# ✨ Import all models via models/__init__.py
 import backend.database.models  # noqa: F401
 
-# Настройки проекта
+# Project settings
 from backend.core.config import settings
 from backend.database.models.base import Base
 from sqlalchemy import pool
@@ -20,10 +20,10 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# URL базы из настроек
+# Database URL from settings
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 
-# Метаданные SQLAlchemy (теперь содержат все таблицы)
+# SQLAlchemy metadata (now contains all tables)
 target_metadata = Base.metadata
 
 
