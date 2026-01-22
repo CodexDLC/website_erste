@@ -84,9 +84,8 @@ async def run_alembic_migrations() -> None:
     """
     import asyncio
 
-    from alembic.config import Config
-
     from alembic import command
+    from alembic.config import Config
 
     def _run_sync_migrations() -> None:
         """Synchronous wrapper for Alembic command (runs in thread pool)"""
